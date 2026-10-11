@@ -1,5 +1,5 @@
 import { Metric, PageHeader, Panel, PanelHead, SmallSampleTag } from "@/components/ui";
-import { dayKeyWib, formatMoney, formatSignedMoney, pnlClass } from "@/lib/format";
+import { dayKeyWib, formatMoney, formatSignedMoney, parseEntryModel, pnlClass } from "@/lib/format";
 import { listAccounts, listTrades } from "@/lib/queries";
 import { breakdown, drawdown, equityCurve, streaks, summarise, type Bucket } from "@/lib/stats";
 import type { Trade } from "@/lib/types";
@@ -46,6 +46,9 @@ const RISK_BUCKET = (trade: Trade) => {
   if (trade.risk_percent <= 1) return "Sedang (0.5-1%)";
   return "Besar (>1%)";
 };
+
+const ENTRY_MODEL_BUCKET = (trade: Trade) =>
+  parseEntryModel(trade.reason_entry) ?? "Tidak dicatat";
 
 function BreakdownTable({
   title,
@@ -262,6 +265,7 @@ export default async function StatistikPage({
           <BreakdownTable title="Per durasi" rows={breakdown(closed, DURATION_BUCKET)} />
           <BreakdownTable title="Per emosi" rows={breakdown(closed, (t) => t.emotion)} />
           <BreakdownTable title="Per bulan" rows={breakdown(closed, (t) => dayKeyWib(t.entry_time).slice(0, 7))} />
+          <BreakdownTable title="Per model entry" rows={breakdown(closed, ENTRY_MODEL_BUCKET)} />
           <BreakdownTable title="Per akun" rows={breakdown(closed, (t) => accounts.find((a) => a.id === t.account_id)?.name ?? "Tanpa akun")} />
         </div>
       </div>

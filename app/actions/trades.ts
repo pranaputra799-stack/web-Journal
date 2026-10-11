@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth";
 import {
+  formatReasonWithModel,
   toNullableNumber,
   toNullableText,
   toNumber,
@@ -63,7 +64,10 @@ function tradeFromForm(form: FormData, userId: string) {
     risk_percent: toNullableNumber(form.get("risk_percent")),
     risk_amount: riskAmount,
     r_multiple: rMultiple,
-    reason_entry: toNullableText(form.get("reason_entry")),
+    reason_entry: formatReasonWithModel(
+      toNullableText(form.get("entry_model")),
+      toNullableText(form.get("reason_entry")),
+    ),
     emotion: toNullableText(form.get("emotion")),
     emotion_note: toNullableText(form.get("emotion_note")),
     mistakes: toNullableText(form.get("mistakes")),

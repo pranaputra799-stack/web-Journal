@@ -4,12 +4,14 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 
 import { Field } from "@/components/ui";
-import { utcIsoToWibInput } from "@/lib/format";
+import { cleanReasonText, parseEntryModel, utcIsoToWibInput } from "@/lib/format";
 import {
   DIRECTIONS,
   EMOTIONS,
+  ENTRY_MODELS,
   RESULTS,
   type Account,
+  type EntryModel,
   type Trade,
 } from "@/lib/types";
 
@@ -62,6 +64,11 @@ export function TradeForm({
   );
   const [riskAmount, setRiskAmount] = useState<string>(
     trade?.risk_amount ? String(trade.risk_amount) : "",
+  );
+
+  // Entry model parsed from existing reason_entry (e.g. "[Model: Reversal] ...")
+  const [entryModel, setEntryModel] = useState<EntryModel | null>(
+    trade?.reason_entry ? parseEntryModel(trade.reason_entry) : null,
   );
 
   // Auto calculate R:R when entry, SL, TP change
@@ -484,11 +491,43 @@ export function TradeForm({
           </div>
 
           <div className="space-y-4">
+            {/* Entry Model selector */}
+            <div>
+              <span className="num text-[11px] text-muted">MODEL ENTRY</span>
+              <input type="hidden" name="entry_model" value={entryModel ?? ""} />
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {ENTRY_MODELS.map((model) => {
+                  const active = entryModel === model;
+                  const icon =
+                    model === "Continuation"
+                      ? "➡"
+                      : model === "Reversal"
+                      ? "↩"
+                      : "⚡";
+                  return (
+                    <button
+                      key={model}
+                      type="button"
+                      onClick={() => setEntryModel(active ? null : model)}
+                      className={`num flex items-center justify-center gap-1.5 cursor-pointer rounded border py-2.5 px-2 text-xs text-center transition-all ${
+                        active
+                          ? "border-brass bg-brass text-brass-ink font-semibold shadow-sm"
+                          : "border-line text-muted hover:border-line-strong hover:text-paper"
+                      }`}
+                    >
+                      <span className="text-base leading-none">{icon}</span>
+                      <span>{model}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <Field label="ALASAN ENTRY" hint="Setup apa, level apa, konfirmasi apa.">
               <textarea
                 name="reason_entry"
                 rows={3}
-                defaultValue={trade?.reason_entry ?? ""}
+                defaultValue={trade?.reason_entry ? cleanReasonText(trade.reason_entry) : ""}
                 placeholder="Contoh: Rejection di support H4, konfirmasi candle engulfing M15."
                 className="mt-1.5 text-sm"
               />

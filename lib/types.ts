@@ -4,6 +4,13 @@ export type AccountType = "funded" | "live" | "demo";
 export type Direction = "Buy" | "Sell";
 export type TradeResult = "TP" | "SL" | "BE" | "Manual";
 export type TradeStatus = "Open" | "Done";
+export type EntryModel = "Continuation" | "Reversal" | "Counter Trend";
+
+export const ENTRY_MODELS: EntryModel[] = [
+  "Continuation",
+  "Reversal",
+  "Counter Trend",
+];
 
 export interface Account {
   id: string;

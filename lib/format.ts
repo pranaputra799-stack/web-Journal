@@ -165,3 +165,42 @@ export function toNullableText(value: FormDataEntryValue | null): string | null 
   const text = String(value).trim();
   return text === "" ? null : text;
 }
+
+export type EntryModel = "Continuation" | "Reversal" | "Counter Trend";
+
+export function parseEntryModel(reason: string | null | undefined): EntryModel | null {
+  if (!reason) return null;
+  const match = reason.match(/\[Model:\s*(Continuation|Reversal|Counter Trend)\]/i);
+  if (match) {
+    const val = match[1].toLowerCase();
+    if (val.includes("continuation")) return "Continuation";
+    if (val.includes("counter")) return "Counter Trend";
+    if (val.includes("reversal")) return "Reversal";
+  }
+  const bracketMatch = reason.match(/\[(Continuation|Reversal|Counter Trend)\]/i);
+  if (bracketMatch) {
+    const val = bracketMatch[1].toLowerCase();
+    if (val.includes("continuation")) return "Continuation";
+    if (val.includes("counter")) return "Counter Trend";
+    if (val.includes("reversal")) return "Reversal";
+  }
+  const lower = reason.toLowerCase();
+  if (lower.startsWith("counter trend") || lower.includes("model: counter trend")) return "Counter Trend";
+  if (lower.startsWith("reversal") || lower.includes("model: reversal")) return "Reversal";
+  if (lower.startsWith("continuation") || lower.includes("model: continuation")) return "Continuation";
+  return null;
+}
+
+export function cleanReasonText(reason: string | null | undefined): string {
+  if (!reason) return "";
+  return reason
+    .replace(/\[Model:\s*(Continuation|Reversal|Counter Trend)\]\s*/i, "")
+    .replace(/\[(Continuation|Reversal|Counter Trend)\]\s*/i, "")
+    .trim();
+}
+
+export function formatReasonWithModel(model: string | null | undefined, text: string | null | undefined): string | null {
+  const clean = text?.trim() ?? "";
+  if (!model) return clean || null;
+  return clean ? `[Model: ${model}] ${clean}` : `[Model: ${model}]`;
+}
