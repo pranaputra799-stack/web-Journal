@@ -1,0 +1,16 @@
+﻿Pair,Date - Entry,Date - Exit,Direction,Note,Profit / Loss,Progress,R:R,Reason - Entry,Result,Risk
+XAUUSD,"June 1, 2026","June 1, 2026",Buy,,-$3.72,Done,,,SL,
+XAGUSD,"June 2, 2026","June 2, 2026",Buy,,-$24.00,Done,,,SL,
+GBPUSD,"June 2, 2026","June 3, 2026",Sell,,$48.41,Done,,,TP,
+NQ100,"June 4, 2026","June 4, 2026",Buy,,$0.32,Done,,,BEP,
+GBPUSD,"June 17, 2026","June 18, 2026",Buy,,$0.66,Done,,,BEP,
+XAUUSD,"June 9, 2026","June 9, 2026",Buy,,-$20.18,Done,,,SL,
+USDJPY,"June 10, 2026","June 16, 2026",Sell,,$1.05,Done,,,BEP,
+XAUUSD,"June 10, 2026","June 10, 2026",Sell,,-$9.05,Done,,,SL,
+XAUUSD,"June 10, 2026","June 10, 2026",Buy,,-$14.96,Done,,,SL,
+EURUSD,"June 17, 2026","June 17, 2026",Sell,,$40.56,Done,,,TP,
+EURUSD,"June 18, 2026","June 18, 2026",Sell,,-$5.40,Done,,,SL,
+EURUSD,"June 18, 2026","June 18, 2026",Sell,,-$16.20,Done,,,SL,
+EURUSD,"June 25, 2026","June 25, 2026",Sell,follow trend bearish,-$15.00,Done,2,FVG + IFVG,SL,0.15%
+XAUUSD,"June 29, 2026","June 29, 2026",Buy,,-$26.14,Done,2,,SL,
+XAUUSD,"June 30, 2026","June 30, 2026",Buy,,$45.54,Done,2,,TP,

@@ -1,0 +1,21 @@
+﻿Pair,Date - Entry,Date - Exit,Direction,Note - After,Note - Before,Profit / Loss,Progress,R:R,Reason - Entry,Result,Risk
+XAUUSD,"August 3, 2026","August 5, 2026",Buy,,,$125.32,Done,5,Signal,TP,0.25%
+XAUUSD,"August 4, 2026","August 5, 2026",Buy,,,$51.76,Done,2,Signal,TP,0.25%
+GBPUSD,"August 4, 2026","August 5, 2026",Sell,,,-$7.20,Done,2,Signal,SL,0.25%
+XAUUSD,"August 6, 2026","August 7, 2026",Sell,,"Risk mau ga mau diperbesar mengikuti signal, dan karena masih masuk akal",-$36.05,Done,4,Signal,SL,0.36%
+XAUUSD,"August 7, 2026","August 7, 2026",Sell,,"Risk mau ga mau diperbesar mengikuti signal, dan karena masih masuk akal",-$40.14,Done,3,Signal,SL,0.38%
+EURUSD,"August 11, 2026","August 11, 2026",Sell,,"scalping, ez trade",$70.92,Done,2,Fibo + target TP jelas,TP,0.26%
+EURUSD,"August 11, 2026","August 13, 2026",Buy,,"pede TP, karena banyak alasan pendukung",-$25.02,Done,3,Fibo + Trendline h1 + rsi,SL,0.25%
+XAUUSD,"August 12, 2026","August 12, 2026",Buy,,krna slippage jadi -26 yg aslinya sl $10,-$26.21,Done,2,news cpi,SL,0.25%
+XAUUSD,"August 11, 2026","August 11, 2026",Buy,,,$25.11,Done,2,,TP,0.12%
+XAUUSD,"August 17, 2026","August 17, 2026",Buy,,bajingan njilat SL tok trus mbalik,-$28.65,Done,3,Suppprt,SL,0.3%
+EURUSD,"August 17, 2026","August 19, 2026",Buy,tp partial di $25 jadi yg seharusnya tp max di $75 jadi cuman $62,"semoga tp, tapi sangat memungkinkan untuk sl karena dibawah masih banyak fvg",$62.40,Done,3,"Fibo, Support, FVG",TP,0.25%
+XAUUSD,"August 20, 2026","August 20, 2026",Sell,"udah floating profit sekitar $50 malah dibalikin ",,$0.63,Done,3,resistance m15 + IFVG,BEP,0.25%
+EURUSD,"August 24, 2026","August 25, 2026",Sell,ez trade,coba strategi baru,$36.06,Done,1,VWAP,TP,0.36%
+EURUSD,"August 25, 2026","August 25, 2026",Buy,"nt, ada resistance di tf besar",,-$25.20,Done,1,VWAP,SL,0.25%
+" EURUSD","August 25, 2026","August 25, 2026",Sell,,,$23.46,Done,1,VWAP,TP,0.23%
+EURUSD,"August 25, 2026","August 25, 2026",Buy,,,-$14.40,Done,1,VWAP,SL,0.14%
+EURUSD,"August 25, 2026","August 25, 2026",Buy,,,$34.08,Done,1,vwap,TP,0.3%
+EURUSD,"August 26, 2026","August 26, 2026",Sell,,,-$22.68,Done,1,vwap,SL,0.2%
+EURUSD,"August 26, 2026","August 26, 2026",Sell,,,-$26.52,Done,1,vwap,SL,0.26%
+EURUSD,"August 27, 2026","August 27, 2026",Buy,,,-$26.00,Done,1,vwap,SL,0.26%

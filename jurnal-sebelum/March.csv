@@ -1,0 +1,25 @@
+﻿Pair,Date - Entry,Date - Exit,Direction,Profit / Loss,Progress,R:R,Reason - Entry,Result,Risk
+XAUUSD,"March 2, 2026","March 2, 2026",Buy,-$40.64,Done,2,Fibo(50%) + RSI + sweep London,SL,0.4%
+XAUUSD,"March 3, 2026","March 3, 2026",Buy,$60.98,Done,2,Fibo + RSI + sweep new york,TP,0.3%
+XAUUSD,"March 3, 2026","March 3, 2026",Buy,-$15.08,Done,2,RSI + sweep asia,SL,0.15%
+XAUUSD,"March 3, 2026","March 3, 2026",Buy,-$10.12,Done,3,"RSI + sweep asia, london",SL,0.15%
+XAUUSD,"March 3, 2026","March 3, 2026",Buy,-$14.82,Done,3,Ifvg + rsi,SL,0.15%
+XAUUSD,"March 3, 2026","March 3, 2026",Buy,$9.83,Done,3,Re-entry (Penasaran),SL+,0.2%
+XAUUSD,"March 4, 2026","March 4, 2026",Buy,-$21.64,Done,3,Fvg m15 + RSI,SL,0.2%
+NZDUSD,"March 5, 2026","March 6, 2026",Buy,-$15.00,Done,2,RSI + Fibo(50%),SL,0.15%
+XAUUSD,"March 5, 2026","March 5, 2026",Buy,-$20.16,Done,2,RSI + ifvg + fvg,SL,0.2%
+XAUUSD,"March 6, 2026","March 6, 2026",Buy,$40.81,Done,2,Fibo(62%) + rsi + sweep low asia,TP,0.2%
+EURUSD,"March 9, 2026","March 10, 2026",Buy,$30.03,Done,3,"Fibo(62%) + rsi + sweep pwl, pdl",TP,0.1%
+XAUUSD,"March 9, 2026","March 9, 2026",Sell,-$20.25,Done,2,"Double top, SL nya terlalu tipis",SL,0.2%
+USDCHF,"March 11, 2026","March 12, 2026",Buy,$29.92,Done,2,Fvg + fibo(62%),TP,0.15%
+EURUSD,"March 11, 2026","March 11, 2026",Buy,-$7.53,Done,3,fibo,SL,0.07%
+XAUUSD,"March 12, 2026","March 12, 2026",Buy,-$14.97,Done,2,Fvg + Fibo(62%),SL,0.15%
+USDCHF,"March 17, 2026","March 19, 2026",Sell,$11.84,Done,2,sweep pwh + fvh H1 + Fibo(50%) + double top,SL+,0.1%
+GBPUSD,"March 20, 2026","March 23, 2026",Buy,-$12.36,Done,2,Fvg+ fibo,SL,0.2%
+XAUUSD,"March 24, 2026","March 24, 2026",Sell,-$10.39,Done,2,Fvg,SL,0.1%
+EURUSD,"March 25, 2026","March 25, 2026",Sell,$1.20,Done,2,"Sweep pwh, fibo",SL+,0.2%
+XAUUSD,"March 25, 2026","March 25, 2026",Buy,$21.22,Done,2,"RSI, sweep low London, mss",TP,0.1%
+XAUUSD,"March 26, 2026","March 26, 2026",Buy,-$10.01,Done,2,Sweep low asia,SL,0.1%
+XAUUSD,"March 26, 2026","March 26, 2026",Buy,$20.23,Done,2,"mss, masuk fvg h1, rsi",TP,0.1%
+WTI/USOIL,"March 26, 2026","March 27, 2026",Sell,-$10.45,Done,3,"fibo, support become resistance, rsi",SL,0.1%
+XAUUSD,"March 27, 2026","March 27, 2026",Buy,$20.18,Done,2,,TP,0.1%

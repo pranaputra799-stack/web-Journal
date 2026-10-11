@@ -1,0 +1,61 @@
+﻿Pair,Date - Entry,Date - Exit,Direction,Note,Profit / Loss,Progress,R:R,Reason - Entry,Result,Risk
+EURUSD,"May 4, 2026","May 4, 2026",Buy,,-$24.90,Done,3,Signal,SL,0.25%
+AUDUSD,"May 4, 2026","May 4, 2026",Buy,,-$10.16,Done,3,Signal,SL,0.1%
+EURJPY,"May 4, 2026","May 5, 2026",Sell,Kena spred karena news,-$32.26,Done,3,Signal,SL,0.25%
+XAUUSD,"May 5, 2026","May 5, 2026",Buy,,-$14.73,Done,3,Signal,SL,0.15%
+GBPUSD,"May 5, 2026","May 5, 2026",Buy,,-$15.20,Done,3,Signal,SL,0.15%
+EURUSD,"May 5, 2026","May 6, 2026",Buy,"TP partial jadi kurang maksimal, seharusnya bisa +60",$45.80,Done,3,Signal,TP,0.2%
+EURJPY,"May 6, 2026","May 11, 2026",Buy,,$9.10,Done,3,Signal,SL+,0.2%
+AUDNZD,"May 5, 2026","May 7, 2026",Buy,"Kena spread, kayaknya news",-$27.79,Done,3,Signal,SL,0.25%
+WTI/USOIL,"May 7, 2026","May 8, 2026",Sell,,$2.00,Done,4,Signal,BEP,0.2%
+XAUUSD,"May 7, 2026","May 8, 2026",Buy,,$1.50,Done,3,Signal,BEP,0.2%
+USDCAD,"May 7, 2026","May 7, 2026",Sell,,-$23.32,Done,3,Signal,SL,0.25%
+BTCUSD,"May 8, 2026","May 9, 2026",Sell,,-$11.57,Done,2,Signal,SL,0.15%
+XAUUSD,"May 8, 2026","May 8, 2026",Sell,,$30.28,Done,2,Signal,TP,0.15%
+XAUUSD,"May 11, 2026","May 11, 2026",Buy,,$40.18,Done,2,Signal,TP,0.2%
+XAUUSD,"May 11, 2026","May 11, 2026",Buy,,-$25.25,Done,2,Signal,SL,0.25%
+BTCUSD,"May 11, 2026","May 15, 2026",Sell,,$2.30,Done,3,Signal,BEP,0.25%
+XAUUSD,"May 11, 2026","May 12, 2026",Sell,,-$20.43,Done,3,Signal,SL,0.2%
+NZDUSD,"May 11, 2026","May 12, 2026",Buy,,-$25.62,Done,3,Signal,SL,0.25%
+GBPUSD,"May 12, 2026","May 13, 2026",Buy,,-$13.36,Done,3,Signal,SL,0.13%
+XAUUSD,"May 12, 2026","May 13, 2026",Buy,,$51.14,Done,2,Signal,TP,0.25%
+CHFJPY,"May 14, 2026","May 15, 2026",Sell,,$20.90,Done,3,Signal,SL+,0.1%
+WTI/USOIL,"May 14, 2026","May 15, 2026",Buy,,$12.12,Done,2,Signal,TP,0.05%
+XAUUSD,"May 15, 2026","May 15, 2026",Buy,,-$26.71,Done,2,Signal,SL,0.25%
+EURUSD,"May 15, 2026","May 15, 2026",Buy,,-$18.08,Done,3,Signal,SL,0.2%
+XAUUSD,"May 15, 2026","May 15, 2026",Buy,,-$24.02,Done,2,Signal,SL,0.25%
+XAUUSD,"May 15, 2026","May 15, 2026",Buy,,-$25.32,Done,2,Signal,SL,0.25%
+DJI30,"May 18, 2026","May 18, 2026",Buy,,$55.30,Done,2,Signal,TP,0.25%
+USDCHF,"May 18, 2026","May 19, 2026",Sell,,$0.91,Done,3,Signal,BEP,0.25%
+XAUUSD,"May 18, 2026","May 18, 2026",Buy,,$19.67,Done,2,Signal,TP,0.1%
+XAUUSD,"May 18, 2026","May 18, 2026",Sell,,-$10.82,Done,3,Signal,SL,0.1%
+XAUUSD,"May 18, 2026","May 18, 2026",Buy,,-$15.66,Done,3,Signal,SL,0.15%
+XAUUSD,"May 18, 2026","May 19, 2026",Buy,,$40.06,Done,2,Signal,TP,0.2%
+EURUSD,"May 18, 2026","May 19, 2026",Buy,,$1.40,Done,3,Signal,BEP,0.25%
+XAUUSD,"May 19, 2026","May 19, 2026",Buy,,-$25.10,Done,2,Signal,SL,0.25%
+XAGUSD,"May 19, 2026","May 20, 2026",Buy,,-$50.30,Done,2,Signal,SL,0.5%
+WTI/USOIL,"May 20, 2026","May 20, 2026",Buy,,-$15.19,Done,2,Signal,SL,0.15%
+XAUUSD,"May 21, 2026","May 22, 2026",Buy,,$1.50,Done,2,Signal,BEP,0.25%
+XAUUSD,"May 21, 2026","May 25, 2026",Buy,,$47.21,Done,2,Signal,TP,25%
+USDCHF,"May 22, 2026","May 21, 2026",Sell,,$50.27,Done,2,Signal,TP,0.25%
+GBPJPY,"May 21, 2026","May 22, 2026",Sell,,-$25.77,Done,3,Signal,SL,0.25%
+DAX40,"May 21, 2026","May 21, 2026",Buy,,$48.47,Done,2,Signal,TP,0.25%
+XAUUSD,"May 22, 2026","May 22, 2026",Buy,,-$15.78,Done,2,Signal,SL,0.15%
+XAGUSD,"May 22, 2026","May 22, 2026",Sell,,$37.65,Done,2,Signal,TP,0.2%
+XAGUSD,"May 22, 2027","May 22, 2026",Buy,,$40.00,Done,2,Signal,TP,
+AUDUSD,"May 25, 2026","May 27, 2026",Sell,,$0.59,Done,2,Signal,BEP,
+XAUUSD,"May 26, 2026","May 26, 2026",Buy,,-$39.31,Done,2,Signal,SL,
+XAGUSD,"May 26, 2026","May 26, 2026",Buy,,-$21.05,Done,2,Signal,SL,
+EURUSD,"May 26, 2026","May 28, 2026",Buy,,$1.60,Done,2,Signal,BEP,
+USDJPY,"May 27, 2026","May 27, 2026",Sell,,-$20.16,Done,2,Signal,SL,
+XAUUSD,"May 27, 2026","May 27, 2026",Buy,,-$25.27,Done,2,Signal,SL,
+USDJPY,"May 27, 2026","May 27, 2026",Sell,,-$9.54,Not started,,,SL,
+AUDUSD,"May 27, 2026","May 28, 2026",Buy,,-$25.87,Not started,,,SL,
+XAUUSD,"May 27, 2026","May 27, 2026",Buy,,-$26.50,Not started,,,SL,
+XAUUSD,"May 27, 2026","May 27, 2026",Sell,,-$25.63,Not started,,,SL,
+XAUUSD,"May 28, 2026","May 28, 2026",Sell,,-$15.46,Not started,,,SL,
+CAC40,"May 28, 2026","May 28, 2026",Buy,,$0.60,Not started,,,BEP,
+DAX40,"May 28, 2026","May 28, 2026",Buy,,-$0.34,Not started,,,SL,
+EURUSD,"May 29, 2026","May 29, 2026",Sell,,-$25.08,Not started,,,SL,
+USDCHF,"May 29, 2026","May 29, 2026",Buy,,-$25.39,Not started,,,SL,
+GBPUSD,"May 29, 2026","May 29, 2026",Sell,,-$25.27,Not started,,,SL,

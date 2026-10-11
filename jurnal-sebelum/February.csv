@@ -1,0 +1,22 @@
+﻿Pair,Date - Entry,Date - Exit,Direction,Profit / Loss,Progress,R:R,"Reason - Entry ",Result,Risk
+GBPUSD,"February 4, 2026","February 5, 2026",Sell,$63.12,Done,3,"Cihuy, Fibo + fvg daily",SL+,0.25%
+XAUUSD,"February 4, 2026","February 4, 2026",Sell,-$10.07,Done,5,RSI + support become resistance,SL,0.1%
+XAUUSD,"February 4, 2026","February 4, 2026",Sell,-$10.29,Done,5,RSI + support become resistance,SL,0.1%
+USDCHF,"February 9, 2026","February 10, 2026",Buy,-$26.87,Done,3,Fvg + Fibo,SL,0.27%
+GBPUSD,"February 9, 2026","February 11, 2026",Sell,-$10.08,Done,2,FVG + FIBO,SL,0.25%
+NZDUSD,"February 11, 2026","February 11, 2026",Sell,-$28.26,Done,2,Fibo + support,SL,0.28%
+GBPUSD,"February 11, 2026","February 19, 2026",Sell,$30.08,Done,2,Re-entry after nfp,SL+,0.15%
+NZDUSD,"February 13, 2026","February 18, 2026",Sell,$20.00,Done,2,Re-entry after nfp & CPI.,TP,0.1%
+XAUUSD,"February 16, 2026","February 17, 2026",Sell,$126.02,Done,5,Fvg,TP,0.25%
+XAUUSD,"February 19, 2026","February 19, 2026",Sell,$14.93,Done,2,Sweep High NY + RSI,SL+,0.15%
+XAUUSD,"February 19, 2026","February 19, 2026",Sell,-$15.02,Done,4,Sweep High NY PM + RSI + FVG M15,SL,0.15%
+XAUUSD,"February 20, 2026","February 20, 2026",Sell,-$5.03,Done,3,"RSI + sweep London ",SL,0.05%
+XAUUSD,"February 20, 2026","February 20, 2026",Sell,-$14.74,Done,2,Layering,SL,0.05%
+GBPUSD,"February 23, 2026","February 23, 2026",Sell,-$15.10,Done,3,Fvg + rsi,SL,0.15%
+GBPUSD,"February 23, 2026","February 25, 2026",Buy,$7.80,Done,2,Fibo + fvg,SL+,0.15%
+XAUUSD,"February 25, 2026","February 25, 2026",Buy,$22.35,Done,2,"Fibo + RSI + fvg ",SL+,0.15%
+XAUUSD,"February 25, 2026","February 25, 2026",Sell,-$13.63,Done,2,RSI + sweep london,SL,0.07%
+XAUUSD,"February 27, 2026","February 27, 2026",Sell,$20.92,Done,2,RSI + FVG + sweep new York AM,TP,0.1%
+XAUUSD,"February 20, 2026","February 20, 2026",Sell,-$5.20,Done,2,-,SL,0.05%
+XAUUSD,"February 27, 2026","February 27, 2026",Sell,-$10.16,Done,2,RSI + sweep london,SL,0.1%
+XAUUSD,"February 27, 2026","February 27, 2026",Sell,$0.09,Done,2,RSI + after news CPI,BEP,0.1%

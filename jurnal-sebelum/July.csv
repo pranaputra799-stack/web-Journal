@@ -1,0 +1,18 @@
+﻿Pair,Date - Entry,Date - Exit,Direction,Note,Profit / Loss,Progress,R:R,Reason - Entry,Result,Risk
+EURUSD,"July 2, 2026","July 2, 2026",Sell,,-$14.88,Done,3,,SL,0.15%
+EURUSD,"July 7, 2026","July 7, 2026",Buy,,-$20.16,Done,2,,SL,0.2%
+XAUUSD,"July 7, 2026","July 7, 2026",Sell,,-$20.23,Done,2,,SL,0.2%
+EURUSD,"July 8, 2026","July 8, 2026",Sell,,-$3.72,Done,2,,SL,0.2%
+EURUSD,"July 14, 2026","July 14, 2026",Sell,,-$42.96,Done,2,,SL,0.4%
+XAUUSD,"July 15, 2026","July 15, 2026",Buy,,$4.18,Done,2,,BEP,
+XAUUSD,"July 16, 2026","July 16, 2026",Buy,,$1.03,Done,2,,BEP,
+XAUUSD,"July 8, 2026","July 8, 2026",Buy,,$0.85,Done,2,,BEP,0.2%
+XAUUSD,"July 22, 2026","July 22, 2026",Sell,,-$24.28,Done,3,Signal,SL,0.25%
+XAUUSD,"July 23, 2026","July 23, 2026",Buy,,-$23.31,Done,3,Signal,SL,0.25%
+XAUUSD,"July 27, 2026","July 28, 2026",Buy,,-$24.48,Done,3,Signal,SL,0.25%
+EURUSD,"July 27, 2026","July 28, 2026",Sell,,$33.96,Done,1.5,Fibo + FVG,TP,0.22%
+GBPUSD,"July 28, 2026","July 28, 2026",Sell,,-$24.66,Done,3,Signal,SL,0.25%
+XAUUSD,"August 29, 2026","July 29, 2026",Buy,,-$24.45,Done,3,Signal,SL,0.25%
+XAUUSD,"July 29, 2026","July 30, 2026",Buy,,$71.17,Done,2,"Signal, News",TP,0.25%
+EURUSD,"July 31, 2026","July 31, 2026",Buy,,-$4.76,Done,2,Sweep daily + fvg,SL,0.05%
+GBPCHF,"July 28, 2026","August 5, 2026",Sell,Close karena equity back to 10k,$6.68,Done,3,Swing,SL+,0.25%

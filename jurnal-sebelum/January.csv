@@ -1,0 +1,9 @@
+﻿Pair,Account,Date - Entry,Date - Exit,Direction,Emotions - Entry,Profit / Loss,Progress,R:R,Result,Risk
+XAUUSD,Funded,"January 5, 2026","January 5, 2026",Sell,"yakin, karena udh masuk area fibo",-$20.00,Done,3,SL,0.2%
+XAUUSD,Funded,"January 6, 2026","January 6, 2026",Buy,"Yakin, masuk golden zone fibo+mss",$20.00,Done,2,SL+,0.2%
+XAUUSD,Funded,"January 8, 2026","January 8, 2026",Buy,yuh tp lah,$3.00,Done,3,SL+,0.2%
+AUDUSD,Funded,"January 12, 2026","January 15, 2026",Sell,"fvg + RSI. Yakin ",$1.00,Done,3,BEP,0.2%
+NZDUSD,Funded,"January 12, 2026","January 15, 2026",Sell,Fvg + RSI. yakin sih,$5.00,Done,2,SL+,0.2%
+USDCAD,Funded,"January 27, 2026","January 28, 2026",Buy,"sweep pdl, + fvg m15 + rsi",-$15.00,Done,3,SL,0.15%
+GBPUSD,Funded,"January 28, 2026","January 29, 2026",Sell,"Mahirtrade ",-$11.00,Done,3,SL,0.11%
+USDCHF,Funded,"January 28, 2026","January 29, 2026",Buy,Mahirtrade,$0.15,Done,2,BEP,0.22%

@@ -1,0 +1,29 @@
+﻿Pair,Date - Entry,Date - Exit,Direction,Note,Profit / Loss,Progress,R:R,Reason - Entry,Result,Risk
+XAUUSD,"April 6, 2026","April 6, 2026",Buy,Hampir tp tapi tiba² harga kebanting sampai kena spread yg gede,-$36.58,Done,2,"Fvg, mss, rsi",SL,0.15%
+XAUUSD,"April 7, 2026","April 7, 2026",Buy,,-$10.68,Done,2,"Session, fvg, rsi",SL,0.1%
+XAUUSD,"April 7, 2026","April 7, 2026",Sell,,-$16.50,Done,2,,SL,0.15%
+NZDUSD,"April 7, 2026","April 8, 2026",Buy,"Tp lumayan cepet,  ",$61.74,Done,3,"fvg H4, fibo",TP,0.2%
+AUDUSD,"April 7, 2026","April 7, 2026",Buy,Test naratif,$10.02,Done,2,,TP,0.05%
+XAUUSD,"April 8, 2026","April 8, 2026",Buy,"Hampir tp, tapi RSI overbought jadi harga balik arah",-$10.06,Done,3,Break high,SL,0.1%
+XAUUSD,"April 10, 2026","April 10, 2026",Sell,,-$13.64,Done,2,,SL,0.13%
+XAUUSD,"April 10, 2026","April 10, 2026",Buy,,$15.07,Done,3,,TP,0.05%
+XAUUSD,"April 13, 2026","April 13, 2026",Sell,,-$4.89,Done,2,,SL,0.05%
+XAUUSD,"April 13, 2026","April 13, 2026",Sell,,-$5.25,Done,2,,SL,0.05%
+XAUUSD,"April 13, 2026","April 13, 2026",Buy,,-$5.09,Done,2,,SL,0.05%
+XAUUSD,"April 13, 2026","April 13, 2026",Buy,,-$10.09,Done,2,,SL,0.1%
+XAUUSD,"April 14, 2026","April 14, 2026",Buy,,$0.18,Done,2,,BEP,0.1%
+XAUUSD,"April 14, 2026","April 14, 2026",Buy,,$0.15,Done,2,,BEP,0.1%
+XAUUSD,"April 14, 2026","April 14, 2026",Sell,,-$4.97,Done,2,,SL,0.05%
+XAUUSD,"April 15, 2026","April 15, 2026",Buy,,-$5.16,Done,2,,SL,0.05%
+XAUUSD,"April 15, 2026","April 15, 2026",Buy,,-$3.88,Done,2,,SL,0.05%
+XAUUSD,"April 15, 2026","April 15, 2026",Buy,,-$14.58,Done,2,,SL,0.15%
+XAUUSD,"April 16, 2026","April 16, 2026",Sell,,-$11.33,Done,2,,SL,0.1%
+XAUUSD,"April 16, 2026","April 16, 2026",Buy,,$1.07,Done,2,,SL+,0.1%
+XAUUSD,"April 16, 2026","April 16, 2026",Buy,,-$10.03,Done,2,,SL,0.1%
+XAUUSD,"April 16, 2026","April 16, 2026",Buy,,-$10.08,Done,2,,SL,0.1%
+XAUUSD,"April 17, 2026","April 17, 2026",Sell,,$5.10,Done,1,,TP,0.05%
+XAUUSD,"April 22, 2026","April 22, 2026",Sell,,-$15.01,Done,2,,SL,0.15%
+XAUUSD,"April 22, 2026","April 22, 2026",Sell,,$30.31,Done,2,,TP,0.15%
+XAUUSD,"April 24, 2026","April 24, 2026",Sell,,$0.28,Done,2,,BEP,0.1%
+USDCHF,"April 24, 2026","May 12, 2026",Sell,,$17.04,Done,2,FVG H4 + FIBO 62%,SL+,0.07%
+USDCHF,"April 24, 2026","May 8, 2026",Sell,,$14.24,Done,3,FVH H4 + FIBO 50%,TP,0.18%
