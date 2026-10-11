@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   formatDateWib,
   formatMoney,
@@ -88,7 +88,14 @@ export function PerformanceHeatmap({
     return Array.from(years).sort((a, b) => b - a);
   }, [dayMap]);
 
-  const [selectedYear, setSelectedYear] = useState<number>(() => availableYears[0]);
+  const [selectedYear, setSelectedYear] = useState<number>(availableYears[0]);
+
+  // Keep selectedYear in sync when trade data changes (new year's trades added)
+  useEffect(() => {
+    if (!availableYears.includes(selectedYear)) {
+      setSelectedYear(availableYears[0]);
+    }
+  }, [availableYears, selectedYear]);
 
   // Calculate year metrics
   const stats = useMemo(() => {

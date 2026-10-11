@@ -265,7 +265,11 @@ export interface StreakInfo {
 export function streaks(trades: Trade[]): StreakInfo {
   const closed = trades
     .filter((t) => t.status === "Done" && t.profit_loss !== 0)
-    .sort((a, b) => new Date(a.entry_time).getTime() - new Date(b.entry_time).getTime());
+    .sort(
+      (a, b) =>
+        new Date(a.exit_time ?? a.entry_time).getTime() -
+        new Date(b.exit_time ?? b.entry_time).getTime(),
+    );
 
   let longestWin = 0;
   let longestLoss = 0;

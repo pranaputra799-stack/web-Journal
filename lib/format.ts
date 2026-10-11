@@ -4,6 +4,8 @@
 // daylight saving, so a fixed offset is correct and simpler than a timezone
 // library.
 
+import type { EntryModel } from "@/lib/types";
+
 export const WIB_TZ = "Asia/Jakarta";
 const WIB_OFFSET = "+07:00";
 
@@ -166,7 +168,6 @@ export function toNullableText(value: FormDataEntryValue | null): string | null 
   return text === "" ? null : text;
 }
 
-export type EntryModel = "Continuation" | "Reversal" | "Counter Trend";
 
 export function parseEntryModel(reason: string | null | undefined): EntryModel | null {
   if (!reason) return null;

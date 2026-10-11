@@ -84,7 +84,7 @@ export function DailyLimitAlert({
       role="alert"
       className={`relative overflow-hidden border p-4 shadow-lg transition-all ${
         isBreached
-          ? "border-loss bg-loss/15 text-paper ring-1 ring-loss/40 animate-pulse"
+          ? "border-loss bg-loss/15 text-paper ring-1 ring-loss/40"
           : isWarning
             ? "border-brass bg-brass/10 text-paper"
             : "border-line bg-panel text-paper"

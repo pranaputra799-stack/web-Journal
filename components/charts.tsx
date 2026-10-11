@@ -799,6 +799,8 @@ export function DailyBars({
               className="group relative flex-1 cursor-pointer h-full flex flex-col justify-end"
               onMouseEnter={() => setHoveredKey(day.key)}
               onMouseLeave={() => setHoveredKey(null)}
+              onTouchStart={(e) => { e.preventDefault(); setHoveredKey(day.key); }}
+              onTouchEnd={() => setTimeout(() => setHoveredKey(null), 1500)}
             >
               <div
                 style={{
