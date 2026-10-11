@@ -41,20 +41,22 @@ export function FundedGuard({
         ? "WASPADA"
         : "AMAN";
 
-  // Total Drawdown Cushion (Static 4% from initial balance vs Dynamic)
+  // Total Loss Cushion follows current P/L from initial balance (Statis) vs Dynamic Drawdown
   const isStatic = ddMode === "statis";
   const breachLevel = account.starting_balance - maxTotal;
   const actualEquity = currentEquity ?? (account.starting_balance + currentNetPnl);
   
+  // Current loss based directly on Net P/L
+  const currentLoss = currentNetPnl < 0 ? Math.abs(currentNetPnl) : 0;
+  const lossTracked = isStatic ? currentLoss : maxDrawdown;
+
   // In static mode, cushion is equity above breachLevel ($9,600).
   // In dynamic mode, cushion is maxTotal - maxDrawdown.
   const totalCushion = isStatic
     ? Math.max(0, actualEquity - breachLevel)
     : Math.max(0, maxTotal - maxDrawdown);
 
-  const totalUsedPercent = isStatic
-    ? Math.min(100, (maxDrawdown / maxTotal) * 100)
-    : maxTotal > 0 ? Math.min(100, (maxDrawdown / maxTotal) * 100) : 0;
+  const totalUsedPercent = maxTotal > 0 ? Math.min(100, (lossTracked / maxTotal) * 100) : 0;
 
   const totalStatus =
     (isStatic ? actualEquity <= breachLevel : maxDrawdown >= maxTotal)
@@ -160,19 +162,28 @@ export function FundedGuard({
             />
           </div>
           <div className="num flex justify-between text-[11px] text-muted">
-            <span>{isStatic ? "rugi dari modal" : "drawdown"} {formatSignedMoney(-maxDrawdown)}</span>
-            <span>batas {formatMoney(maxTotal)} (4%)</span>
+            <span>
+              {isStatic ? "rugi modal (P/L)" : "drawdown"}{" "}
+              <strong className={isStatic ? (currentNetPnl < 0 ? "text-loss" : "text-profit") : (maxDrawdown > 0 ? "text-loss" : "text-paper")}>
+                {isStatic
+                  ? (currentNetPnl < 0 ? formatSignedMoney(currentNetPnl) : "+$0.00 (Profit)")
+                  : (maxDrawdown > 0 ? `-${formatMoney(maxDrawdown)}` : "0.0%")}
+              </strong>
+            </span>
+            <span>
+              batas {formatMoney(maxTotal)} ({account.starting_balance ? Math.round((maxTotal / account.starting_balance) * 100) : 4}%)
+            </span>
           </div>
           <p className="num text-[10px] text-muted">
             {isStatic ? (
               <>
                 Level gagal: <span className="text-paper">{formatMoney(breachLevel)}</span> · Buffer aman:{" "}
-                <span className="font-semibold text-paper">{formatMoney(totalCushion)}</span>
+                <span className="font-semibold text-brass">{formatMoney(totalCushion)}</span>
               </>
             ) : (
               <>
                 Sisa ruang drawdown:{" "}
-                <span className="font-semibold text-paper">{formatMoney(totalCushion)}</span>
+                <span className="font-semibold text-brass">{formatMoney(totalCushion)}</span>
               </>
             )}
           </p>

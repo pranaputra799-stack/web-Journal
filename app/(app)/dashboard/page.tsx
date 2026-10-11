@@ -346,7 +346,13 @@ export default async function DashboardPage({
                 {ddMode === "statis" ? (
                   <>
                     <div className="flex justify-between">
-                      <span>Max Drawdown Statis:</span>
+                      <span>Rugi Modal Saat Ini (P/L):</span>
+                      <span className={allSummary.netPnl < 0 ? "text-loss font-semibold" : "text-profit font-semibold"}>
+                        {formatSignedMoney(allSummary.netPnl)} ({formatSignedPercent(totalEquityPercent)})
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Max DD Terburuk (Historis):</span>
                       <span className={dd.maxDrawdown > 0 ? "text-loss font-medium" : "text-profit font-medium"}>
                         {dd.maxDrawdown > 0
                           ? `-${dd.maxDrawdownPercent.toFixed(1)}% (${formatMoney(dd.maxDrawdown)})`
@@ -364,6 +370,12 @@ export default async function DashboardPage({
                   </>
                 ) : (
                   <>
+                    <div className="flex justify-between">
+                      <span>Drawdown Saat Ini:</span>
+                      <span className={dd.current > 0 ? "text-loss font-semibold" : "text-profit font-semibold"}>
+                        {dd.current > 0 ? `-${dd.currentPercent.toFixed(1)}% (${formatMoney(dd.current)})` : "0.0% (Puncak)"}
+                      </span>
+                    </div>
                     <div className="flex justify-between">
                       <span>Max Drawdown Dinamis:</span>
                       <span className={dd.maxDrawdown > 0 ? "text-loss font-medium" : "text-profit font-medium"}>
