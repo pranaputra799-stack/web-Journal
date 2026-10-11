@@ -50,9 +50,12 @@ export default async function DashboardPage({
   const ddMode = params.dd === "dinamis" ? "dinamis" : "statis";
   const bounds = rangeBounds(range);
 
-  const [accounts, trades] = await Promise.all([
+  // Filtered trades for the selected date range / account — used for stats.
+  // ALL trades (unfiltered) — used for equity curve & total saldo.
+  const [accounts, trades, allTrades] = await Promise.all([
     listAccounts(),
     listTrades({ from: bounds.from, to: bounds.to, accountId: params.akun }),
+    listTrades(),
   ]);
 
   const summary = summarise(trades);
@@ -61,8 +64,10 @@ export default async function DashboardPage({
     (activeAccount?.starting_balance ??
       accounts.reduce((sum, account) => sum + account.starting_balance, 0)) || 10000;
 
-  const points = equityCurve(trades, startingBalance);
-  const dd = drawdown(points, summary.netPnl, ddMode, startingBalance, 4);
+  // Equity curve is based on ALL trades so "Saldo Saat Ini" is always accurate.
+  const allSummary = summarise(allTrades);
+  const points = equityCurve(allTrades, startingBalance);
+  const dd = drawdown(points, allSummary.netPnl, ddMode, startingBalance, 4);
   const currentEquity = points.length > 0 ? points[points.length - 1].equity : startingBalance;
   const streak = streaks(trades);
 
@@ -74,6 +79,7 @@ export default async function DashboardPage({
   const recent = trades.slice(0, 5);
   const netTone = summary.netPnl > 0 ? "profit" : summary.netPnl < 0 ? "loss" : "flat";
   const netPercent = startingBalance > 0 ? (summary.netPnl / startingBalance) * 100 : 0;
+  const totalEquityPercent = startingBalance > 0 ? (allSummary.netPnl / startingBalance) * 100 : 0;
   const isPercent = unit === "persen";
 
   // Outcome distribution calculations (TP / SL / BE / Manual)
@@ -202,8 +208,8 @@ export default async function DashboardPage({
             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted md:justify-end">
               <span>Modal awal: <span className="num text-paper font-medium">{formatMoney(startingBalance)}</span></span>
               <span>·</span>
-              <span className={`num font-medium ${summary.netPnl >= 0 ? "text-profit" : "text-loss"}`}>
-                {formatSignedPercent(netPercent)} ({formatSignedMoney(summary.netPnl)})
+              <span className={`num font-medium ${allSummary.netPnl >= 0 ? "text-profit" : "text-loss"}`}>
+                {formatSignedPercent(totalEquityPercent)} ({formatSignedMoney(allSummary.netPnl)})
               </span>
             </div>
           </div>
