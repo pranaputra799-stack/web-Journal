@@ -128,19 +128,103 @@ export default async function PengaturanPage() {
         </Panel>
 
         <Panel>
-          <PanelHead title="Backup dan ekspor" />
-          <div className="space-y-3 px-4 py-5">
+          <PanelHead
+            title="Backup dan Ekspor Data"
+            note="Simpan salinan offline data tradingmu"
+          />
+          <div className="space-y-4 px-4 py-5 md:px-6">
             <p className="text-sm text-muted">
-              Ekspor mengunduh seluruh trade dan catatanmu sebagai file CSV.
-              Jalankan rutin sebulan sekali. File ikut cadangan terpisah dari
-              database.
+              File cadangan disimpan secara mandiri dan terpisah dari server cloud. Disarankan untuk mengekspor atau membuat cadangan rutin setiap minggu atau akhir bulan.
             </p>
-            <a
-              href="/api/export"
-              className="num inline-block border border-brass px-4 py-2.5 text-sm text-brass"
-            >
-              Unduh CSV
-            </a>
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {/* Card 1: Trades CSV */}
+              <div className="flex flex-col justify-between rounded border border-line bg-surface-2/40 p-4 transition-colors hover:border-line-strong">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="num text-xs font-semibold tracking-wider text-brass">
+                      CSV SPREADSHEET
+                    </span>
+                    <span className="rounded bg-brass/15 px-1.5 py-0.5 text-[10px] font-mono text-brass">
+                      .CSV
+                    </span>
+                  </div>
+                  <h4 className="mt-2 text-sm font-medium text-paper">
+                    Ekspor Riwayat Trades
+                  </h4>
+                  <p className="mt-1 text-xs leading-relaxed text-muted">
+                    Rekapan seluruh transaksi lengkap dengan nama akun, harga, lot, P/L, R:R aktual, emosi, dan catatan evaluasi. Siap diolah di Excel / Google Sheets.
+                  </p>
+                </div>
+                <div className="mt-4 pt-2">
+                  <a
+                    href="/api/export?type=trades"
+                    className="num flex w-full items-center justify-center gap-2 rounded border border-line px-3 py-2 text-xs font-medium text-paper transition-colors hover:border-brass hover:text-brass"
+                  >
+                    <span>Unduh CSV Trades</span>
+                    <span className="font-mono text-[10px] text-muted">↓</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Card 2: Notes CSV */}
+              <div className="flex flex-col justify-between rounded border border-line bg-surface-2/40 p-4 transition-colors hover:border-line-strong">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="num text-xs font-semibold tracking-wider text-muted">
+                      CSV JURNAL
+                    </span>
+                    <span className="rounded bg-line px-1.5 py-0.5 text-[10px] font-mono text-paper">
+                      .CSV
+                    </span>
+                  </div>
+                  <h4 className="mt-2 text-sm font-medium text-paper">
+                    Ekspor Catatan Harian
+                  </h4>
+                  <p className="mt-1 text-xs leading-relaxed text-muted">
+                    Log harian psikologi trading: rating mood, rencana pagi (morning plan), evaluasi review sore, dan catatan harian per tanggal.
+                  </p>
+                </div>
+                <div className="mt-4 pt-2">
+                  <a
+                    href="/api/export?type=notes"
+                    className="num flex w-full items-center justify-center gap-2 rounded border border-line px-3 py-2 text-xs font-medium text-paper transition-colors hover:border-brass hover:text-brass"
+                  >
+                    <span>Unduh CSV Catatan</span>
+                    <span className="font-mono text-[10px] text-muted">↓</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Card 3: Full JSON Backup */}
+              <div className="flex flex-col justify-between rounded border border-brass/50 bg-brass/5 p-4 transition-colors hover:border-brass sm:col-span-2 lg:col-span-1">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="num text-xs font-semibold tracking-wider text-brass">
+                      FULL BACKUP
+                    </span>
+                    <span className="rounded bg-brass px-1.5 py-0.5 text-[10px] font-mono font-medium text-brass-ink">
+                      .JSON
+                    </span>
+                  </div>
+                  <h4 className="mt-2 text-sm font-medium text-paper">
+                    Cadangan Lengkap Database
+                  </h4>
+                  <p className="mt-1 text-xs leading-relaxed text-muted">
+                    Cadangan utuh seluruh database: seluruh akun, riwayat trade, dan catatan harian dalam format JSON terstruktur. Sangat disarankan untuk arsip utama.
+                  </p>
+                </div>
+                <div className="mt-4 pt-2">
+                  <a
+                    href="/api/export?format=json"
+                    className="num flex w-full items-center justify-center gap-2 rounded bg-brass px-3 py-2 text-xs font-semibold text-brass-ink transition-opacity hover:opacity-90"
+                  >
+                    <span>Cadangkan Penuh (JSON)</span>
+                    <span className="font-mono text-[10px]">↓</span>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </Panel>
 

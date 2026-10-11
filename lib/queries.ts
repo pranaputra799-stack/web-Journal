@@ -82,13 +82,16 @@ export async function getDailyNote(day: string): Promise<DailyNote | null> {
   return (data as DailyNote) ?? null;
 }
 
-export async function listDailyNotes(limit = 60): Promise<DailyNote[]> {
+export async function listDailyNotes(limit?: number): Promise<DailyNote[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("daily_notes")
     .select("*")
-    .order("day", { ascending: false })
-    .limit(limit);
+    .order("day", { ascending: false });
+  if (typeof limit === "number") {
+    query = query.limit(limit);
+  }
+  const { data, error } = await query;
   if (error) throw new Error(error.message);
   return (data ?? []) as DailyNote[];
 }
