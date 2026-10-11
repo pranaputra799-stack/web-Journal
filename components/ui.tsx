@@ -32,7 +32,7 @@ export function Panel({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <section className={`panel-surface ${className}`}>{children}</section>;
+  return <section className={`panel-surface overflow-hidden ${className}`}>{children}</section>;
 }
 
 export function PanelHead({
@@ -43,9 +43,9 @@ export function PanelHead({
   note?: string;
 }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 border-b border-line px-4 py-3">
-      <h2 className="text-base">{title}</h2>
-      {note && <span className="num text-xs text-muted">{note}</span>}
+    <div className="flex items-baseline justify-between gap-3 border-b border-line/60 px-4 py-3 bg-raised/20">
+      <h2 className="text-sm font-semibold tracking-tight text-paper">{title}</h2>
+      {note && <span className="num text-xs text-muted font-normal">{note}</span>}
     </div>
   );
 }
@@ -81,7 +81,7 @@ export function SmallSampleTag() {
   return (
     <span
       title="Jumlah trade masih di bawah 30, angka ini belum bisa dipercaya."
-      className="num border border-line px-1.5 py-0.5 text-[10px] text-muted"
+      className="num border border-line px-1.5 py-0.5 text-[10px] text-muted rounded-[2px]"
     >
       sampel kecil
     </span>
@@ -105,23 +105,23 @@ export function Metric({
 }) {
   const toneClass =
     tone === "profit"
-      ? "text-profit"
+      ? "text-profit font-semibold"
       : tone === "loss"
-        ? "text-loss"
+        ? "text-loss font-semibold"
         : tone === "brass"
-          ? "text-brass"
+          ? "text-brass font-semibold"
           : tone === "flat"
             ? "text-flat"
-            : "text-paper";
+            : "text-paper font-semibold";
 
   return (
-    <div className={className}>
+    <div className={`group rounded p-1 transition-colors hover:bg-raised/35 ${className}`}>
       <div className="flex items-center gap-2">
-        <span className="num text-[11px] text-muted">{label}</span>
+        <span className="num text-[11px] text-muted uppercase tracking-wider font-medium">{label}</span>
         {small && <SmallSampleTag />}
       </div>
-      <div className={`num mt-1.5 text-xl ${toneClass}`}>{value}</div>
-      {note && <div className="num mt-1 text-[11px] text-muted">{note}</div>}
+      <div className={`num mt-1.5 text-xl tracking-tight transition-transform duration-150 group-hover:translate-x-0.5 ${toneClass}`}>{value}</div>
+      {note && <div className="num mt-1 text-[11px] text-muted/80">{note}</div>}
     </div>
   );
 }

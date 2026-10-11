@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
 
+import { CommandPalette } from "@/components/command-palette";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const LINKS = [
@@ -165,6 +166,12 @@ export function AppNav({ email }: { email: string }) {
           )}
         </div>
 
+        {!collapsed && (
+          <div className="px-3 pt-3 pb-1">
+            <CommandPalette />
+          </div>
+        )}
+
         {/* Nav items */}
         <ul className="flex-1 py-2">
           {LINKS.map((link) => {
@@ -232,18 +239,14 @@ export function AppNav({ email }: { email: string }) {
 
       {/* ── Mobile: bottom tab bar ────────────────────────────────── */}
       {/* Top bar */}
-      <div className="sticky top-0 z-20 border-b border-line bg-ink/95 backdrop-blur-sm md:hidden">
-        <div className="flex items-center justify-between px-4 py-3">
-          <Link href="/dashboard" className="text-sm font-medium">
+      <div className="sticky top-0 z-20 border-b border-line/70 bg-ink/90 backdrop-blur-md md:hidden">
+        <div className="flex items-center justify-between px-3 py-2.5">
+          <Link href="/dashboard" className="text-sm font-semibold tracking-tight">
             Jurnal <span className="text-brass">Trading</span>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <CommandPalette />
             <ThemeToggle compact />
-            <form action="/auth/signout" method="post">
-              <button type="submit" className="num text-xs text-muted hover:text-loss">
-                Keluar
-              </button>
-            </form>
           </div>
         </div>
       </div>
