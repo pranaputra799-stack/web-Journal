@@ -72,28 +72,44 @@ export async function listPairs(): Promise<string[]> {
 }
 
 export async function getDailyNote(day: string): Promise<DailyNote | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("daily_notes")
-    .select("*")
-    .eq("day", day)
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  return (data as DailyNote) ?? null;
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("daily_notes")
+      .select("*")
+      .eq("day", day)
+      .maybeSingle();
+    if (error) {
+      console.warn(`getDailyNote info for day "${day}":`, error.message);
+      return null;
+    }
+    return (data as DailyNote) ?? null;
+  } catch (err) {
+    console.warn(`getDailyNote caught exception for day "${day}":`, err);
+    return null;
+  }
 }
 
 export async function listDailyNotes(limit?: number): Promise<DailyNote[]> {
-  const supabase = await createClient();
-  let query = supabase
-    .from("daily_notes")
-    .select("*")
-    .order("day", { ascending: false });
-  if (typeof limit === "number") {
-    query = query.limit(limit);
+  try {
+    const supabase = await createClient();
+    let query = supabase
+      .from("daily_notes")
+      .select("*")
+      .order("day", { ascending: false });
+    if (typeof limit === "number") {
+      query = query.limit(limit);
+    }
+    const { data, error } = await query;
+    if (error) {
+      console.warn("listDailyNotes info:", error.message);
+      return [];
+    }
+    return (data ?? []) as DailyNote[];
+  } catch (err) {
+    console.warn("listDailyNotes caught exception:", err);
+    return [];
   }
-  const { data, error } = await query;
-  if (error) throw new Error(error.message);
-  return (data ?? []) as DailyNote[];
 }
 
 // Screenshots live in a private bucket, so each one needs a short-lived

@@ -35,7 +35,7 @@ export default async function CatatanPage({
     listDailyNotes(50),
     listTrades({ from: day, to: day }),
     listTrades({}),
-    getDailyNote(`W-${currentWeek}`),
+    currentTab === "mingguan" ? getDailyNote(`W-${currentWeek}`) : Promise.resolve(null),
   ]);
 
   const pnlByDay = new Map<string, number>();
@@ -47,9 +47,9 @@ export default async function CatatanPage({
 
   const daySummary = summarise(dayTrades);
   const dailyJournalled = notes.filter(
-    (entry) => !entry.day.startsWith("W-") && (entry.morning_plan || entry.evening_review || entry.notes),
+    (entry) => !entry.day?.startsWith("W-") && (entry.morning_plan || entry.evening_review || entry.notes),
   );
-  const weeklyJournalled = notes.filter((entry) => entry.day.startsWith("W-"));
+  const weeklyJournalled = notes.filter((entry) => Boolean(entry.day?.startsWith("W-")));
 
   // Calculate stats for current week
   const weekTrades = allTrades.filter((t) => {

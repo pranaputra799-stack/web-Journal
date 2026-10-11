@@ -227,6 +227,13 @@ export async function saveWeeklyReview(form: FormData) {
     { onConflict: "user_id,day" },
   );
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (error.code === "22007") {
+      throw new Error(
+        "Kolom 'day' di tabel daily_notes Supabase masih bertipe DATE. Buka SQL Editor di dashboard Supabase lalu jalankan: ALTER TABLE public.daily_notes ALTER COLUMN day TYPE text;"
+      );
+    }
+    throw new Error(error.message);
+  }
   revalidatePath("/catatan");
 }
