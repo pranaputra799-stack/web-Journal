@@ -137,7 +137,11 @@ export interface EquityPoint {
 export function equityCurve(trades: Trade[], startingBalance: number): EquityPoint[] {
   const closed = trades
     .filter((t) => t.status === "Done")
-    .sort((a, b) => new Date(a.entry_time).getTime() - new Date(b.entry_time).getTime());
+    .sort(
+      (a, b) =>
+        new Date(a.exit_time ?? a.entry_time).getTime() -
+        new Date(b.exit_time ?? b.entry_time).getTime(),
+    );
 
   let equity = startingBalance;
   let peak = startingBalance;
@@ -227,7 +231,12 @@ export function drawdown(
   const curDd = isStatic ? last.staticDrawdown : last.drawdown;
   const curDdPercent = isStatic ? last.staticDrawdownPercent : last.drawdownPercent;
 
-  const remainingBuffer = last.equity - breachLevel;
+  // Buffer remaining before breaching max loss rule:
+  // - Statis: Sisa saldo di atas level gagal ($9,600 jika modal $10,000)
+  // - Dinamis: Sisa toleransi drawdown dari puncak sebelum mencapai batas 4%
+  const remainingBuffer = isStatic
+    ? Math.max(0, last.equity - breachLevel)
+    : Math.max(0, limitAmount - curDd);
   const bufferPercent = startingBalance > 0 ? (remainingBuffer / startingBalance) * 100 : 0;
 
   return {
@@ -237,7 +246,7 @@ export function drawdown(
     at: worst.time,
     current: curDd,
     currentPercent: curDdPercent,
-    recoveryFactor: maxDd > 0 ? netProfit / maxDd : null,
+    recoveryFactor: maxDd > 0 && netProfit > 0 ? Number((netProfit / maxDd).toFixed(2)) : null,
     staticLimitPercent,
     staticLimitAmount: limitAmount,
     staticBreachLevel: breachLevel,

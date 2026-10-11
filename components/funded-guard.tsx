@@ -57,7 +57,7 @@ export function FundedGuard({
     : maxTotal > 0 ? Math.min(100, (maxDrawdown / maxTotal) * 100) : 0;
 
   const totalStatus =
-    (isStatic && actualEquity <= breachLevel) || maxDrawdown >= maxTotal
+    (isStatic ? actualEquity <= breachLevel : maxDrawdown >= maxTotal)
       ? "MELANGGAR"
       : totalUsedPercent >= 75
         ? "WASPADA"

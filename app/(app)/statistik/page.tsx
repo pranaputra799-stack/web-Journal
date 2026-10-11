@@ -123,7 +123,7 @@ export default async function StatistikPage({
   const closed = trades.filter((trade) => trade.status === "Done");
   const summary = summarise(trades);
   const points = equityCurve(trades, startingBalance);
-  const dd = drawdown(points, summary.netPnl);
+  const dd = drawdown(points, summary.netPnl, "dinamis", startingBalance);
   const streak = streaks(trades);
 
   const dayMap = new Map<string, number>();
@@ -198,7 +198,12 @@ export default async function StatistikPage({
             <Metric label="TRADE TERBURUK" value={summary.worstTrade === null ? "-" : formatSignedMoney(summary.worstTrade)} tone="loss" />
             <Metric label="R:R RENCANA" value={summary.avgPlannedRr === null ? "-" : summary.avgPlannedRr.toFixed(2)} note="rata-rata" />
             <Metric label="RISK RATA-RATA" value={summary.avgRiskPercent === null ? "-" : `${summary.avgRiskPercent.toFixed(2)}%`} />
-            <Metric label="MAX DRAWDOWN" value={formatSignedMoney(-dd.maxDrawdown)} tone="loss" note={dd.maxDrawdownPercent > 0 ? `${dd.maxDrawdownPercent.toFixed(1)}% dari puncak` : undefined} />
+            <Metric
+              label="MAX DRAWDOWN"
+              value={dd.maxDrawdown > 0 ? `-${formatMoney(dd.maxDrawdown)}` : "0.0% (Aman)"}
+              tone={dd.maxDrawdown > 0 ? "loss" : "paper"}
+              note={dd.maxDrawdownPercent > 0 ? `-${dd.maxDrawdownPercent.toFixed(1)}% dari puncak` : undefined}
+            />
             <Metric label="RECOVERY FACTOR" value={dd.recoveryFactor === null ? "-" : dd.recoveryFactor.toFixed(2)} note="net profit / max drawdown" />
           </div>
         </Panel>

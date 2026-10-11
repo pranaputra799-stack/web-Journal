@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import type { EquityPoint } from "@/lib/stats";
 import {
   formatDateWib,
@@ -34,6 +34,10 @@ export function EquityChart({
   const [internalUnit, setInternalUnit] = useState<"dollar" | "percent">(unit);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const clipId = useId();
+
+  useEffect(() => {
+    setInternalUnit(unit);
+  }, [unit]);
 
   const currentUnit = onUnitChange ? unit : internalUnit;
   const toggleUnit = (next: "dollar" | "percent") => {
@@ -134,7 +138,7 @@ export function EquityChart({
           className="h-48 w-full cursor-crosshair touch-none"
           preserveAspectRatio="none"
           role="img"
-          aria-label={`Kurva equity, dari ${formatSignedMoney(base)} menjadi ${formatSignedMoney(lastPoint.equity)}`}
+          aria-label={`Kurva equity, dari ${formatMoney(base)} menjadi ${formatMoney(lastPoint.equity)}`}
           onPointerMove={handlePointerMove}
           onPointerLeave={handlePointerLeave}
         >
@@ -342,7 +346,7 @@ export function EquityChart({
                   <span className="text-muted">DD Puncak:</span>
                   <span className="num text-loss">
                     {hovered.drawdown > 0
-                      ? `${formatSignedMoney(-hovered.drawdown)} (-${hovered.drawdownPercent.toFixed(1)}%)`
+                      ? `-${hovered.drawdownPercent.toFixed(1)}% (${formatMoney(hovered.drawdown)})`
                       : "0.00% (Puncak)"}
                   </span>
                 </div>
@@ -357,12 +361,12 @@ export function EquityChart({
 
       <div className="num mt-2 flex flex-wrap justify-between gap-2 text-[11px] text-muted">
         <span>
-          Modal awal: <span className="text-paper">{isPercent ? "0.00%" : formatSignedMoney(base)}</span>
+          Modal awal: <span className="text-paper">{isPercent ? "0.00%" : formatMoney(base)}</span>
         </span>
         <span className="font-medium text-brass">
           Equity sekarang:{" "}
           <span className="text-paper">
-            {isPercent ? formatSignedPercent(lastPercent) : formatSignedMoney(lastPoint.equity)}
+            {isPercent ? formatSignedPercent(lastPercent) : formatMoney(lastPoint.equity)}
           </span>{" "}
           ({formatSignedMoney(lastPoint.equity - base)})
         </span>
@@ -391,6 +395,14 @@ export function DrawdownChart({
   const [internalUnit, setInternalUnit] = useState<"dollar" | "percent">(unit);
   const [internalMode, setInternalMode] = useState<"dinamis" | "statis">(mode);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    setInternalUnit(unit);
+  }, [unit]);
+
+  useEffect(() => {
+    setInternalMode(mode);
+  }, [mode]);
 
   const currentUnit = onUnitChange ? unit : internalUnit;
   const currentMode = onModeChange ? mode : internalMode;
@@ -565,7 +577,7 @@ export function DrawdownChart({
                 fontSize="9.5"
                 className="num font-semibold"
               >
-                Batas 4% Max DD ({isPercent ? "-4.0%" : formatSignedMoney(-staticLimitAmount)})
+                Batas 4% Max DD ({isPercent ? "-4.0%" : `-${formatMoney(staticLimitAmount)}`})
               </text>
             </g>
           )}
@@ -638,14 +650,14 @@ export function DrawdownChart({
                       <span className="text-muted">DD Statis:</span>
                       <span className={`num font-semibold ${hovered.staticDrawdown > 0 ? "text-loss" : "text-profit"}`}>
                         {hovered.staticDrawdown > 0
-                          ? `${formatSignedMoney(-hovered.staticDrawdown)} (-${hovered.staticDrawdownPercent.toFixed(2)}%)`
+                          ? `-${hovered.staticDrawdownPercent.toFixed(2)}% (${formatMoney(hovered.staticDrawdown)})`
                           : "0.00% (Aman)"}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted">Batas 4%:</span>
                       <span className="num text-loss font-medium">
-                        {formatSignedMoney(-staticLimitAmount)} ({formatMoney(staticBreachLevel)})
+                        -{formatMoney(staticLimitAmount)} ({formatMoney(staticBreachLevel)})
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -660,7 +672,9 @@ export function DrawdownChart({
                     <div className="flex justify-between">
                       <span className="text-muted">DD Puncak:</span>
                       <span className="num font-semibold text-loss">
-                        {formatSignedMoney(-hovered.drawdown)} (-${hovered.drawdownPercent.toFixed(2)}%)
+                        {hovered.drawdown > 0
+                          ? `-${hovered.drawdownPercent.toFixed(2)}% (${formatMoney(hovered.drawdown)})`
+                          : "0.00% (Puncak)"}
                       </span>
                     </div>
                     <div className="flex justify-between">

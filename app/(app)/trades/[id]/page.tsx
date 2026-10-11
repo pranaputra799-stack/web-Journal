@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { deleteScreenshot, deleteTrade, uploadScreenshot } from "@/app/actions/trades";
+import { deleteTrade } from "@/app/actions/trades";
+import { TradeScreenshotSection } from "@/components/trade-screenshot-section";
 import { PageHeader, Panel, PanelHead } from "@/components/ui";
 import {
   formatDateTimeWib,
@@ -124,67 +125,12 @@ export default async function TradeDetailPage({ params }: { params: Params }) {
         </Panel>
 
         <Panel className="md:col-span-3">
-          <PanelHead title="Screenshot" note={`${screenshots.length} berkas`} />
-          <div className="space-y-5 px-4 py-4">
-            <form action={uploadScreenshot} className="grid gap-3 md:grid-cols-4">
-              <input type="hidden" name="trade_id" value={trade.id} />
-              <label className="block md:col-span-2">
-                <span className="num text-[11px] text-muted">BERKAS</span>
-                <input type="file" name="file" accept="image/*" required className="num mt-1.5" />
-              </label>
-              <label className="block">
-                <span className="num text-[11px] text-muted">LABEL</span>
-                <select name="position" className="num mt-1.5">
-                  <option value="sebelum">Sebelum</option>
-                  <option value="sesudah">Sesudah</option>
-                  <option value="htf">HTF</option>
-                </select>
-              </label>
-              <div className="flex items-end">
-                <button type="submit" className="num w-full border border-brass px-3 py-2 text-sm text-brass">
-                  Unggah
-                </button>
-              </div>
-            </form>
-
-            {screenshots.length === 0 ? (
-              <p className="num text-xs text-muted">
-                Belum ada screenshot. Berkas disimpan di bucket privat dan ditampilkan
-                lewat tautan sementara.
-              </p>
-            ) : (
-              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {screenshots.map((shot) => (
-                  <li key={shot.id} className="panel-surface overflow-hidden">
-                    {urls[shot.file_path] ? (
-                      // Signed URLs are short-lived, so next/image optimisation
-                      // is not useful here.
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={urls[shot.file_path]}
-                        alt={shot.caption ?? shot.position ?? "screenshot"}
-                        className="h-40 w-full object-cover"
-                      />
-                    ) : (
-                      <div className="num flex h-40 items-center justify-center text-xs text-muted">
-                        pratinjau tidak tersedia
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between px-3 py-2">
-                      <span className="num text-[11px] text-muted">{shot.position ?? "-"}</span>
-                      <form
-                        action={deleteScreenshot.bind(null, shot.id, trade.id, shot.file_path)}
-                      >
-                        <button type="submit" className="num text-[11px] text-muted hover:text-loss">
-                          hapus
-                        </button>
-                      </form>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <PanelHead title="Screenshot & Anotasi" note={`${screenshots.length} berkas`} />
+          <TradeScreenshotSection
+            tradeId={trade.id}
+            screenshots={screenshots}
+            urls={urls}
+          />
         </Panel>
       </div>
     </>

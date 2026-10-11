@@ -1,7 +1,9 @@
 import Link from "next/link";
 
 import { DailyBars, DrawdownChart, EquityChart } from "@/components/charts";
+import { DailyLimitAlert } from "@/components/daily-limit-alert";
 import { FundedGuard } from "@/components/funded-guard";
+import { PerformanceHeatmap } from "@/components/performance-heatmap";
 import { Empty, Panel, PanelHead, SmallSampleTag } from "@/components/ui";
 import {
   dayKeyWib,
@@ -18,24 +20,24 @@ import { dailyPnl, drawdown, equityCurve, streaks, summarise } from "@/lib/stats
 type SearchParams = Promise<{ rentang?: string; akun?: string; unit?: string; dd?: string }>;
 
 const RANGES = [
+  { key: "semua", label: "Semua" },
   { key: "bulan", label: "Bulan ini" },
   { key: "30", label: "30 hari" },
   { key: "90", label: "90 hari" },
-  { key: "semua", label: "Semua" },
 ];
 
 function rangeBounds(range: string | undefined) {
   const now = new Date();
   const todayKey = dayKeyWib(now.toISOString());
 
-  if (range === "semua") return { from: undefined, to: undefined };
+  if (range === "semua" || !range) return { from: undefined, to: undefined };
   if (range === "30" || range === "90") {
     const days = Number(range);
     const from = new Date(now.getTime() - days * 86400000);
     return { from: dayKeyWib(from.toISOString()), to: todayKey };
   }
 
-  // Default: the current WIB month.
+  // Current WIB month.
   return { from: `${todayKey.slice(0, 7)}-01`, to: todayKey };
 }
 
@@ -45,7 +47,7 @@ export default async function DashboardPage({
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
-  const range = params.rentang ?? "bulan";
+  const range = params.rentang ?? "semua";
   const unit = params.unit === "persen" ? "persen" : "dollar";
   const ddMode = params.dd === "dinamis" ? "dinamis" : "statis";
   const bounds = rangeBounds(range);
@@ -203,7 +205,7 @@ export default async function DashboardPage({
               <span className="h-1.5 w-1.5 rounded-full bg-brass animate-pulse" />
             </div>
             <div className="num mt-1.5 text-2xl font-semibold text-paper md:text-4xl">
-              {formatMoney(currentEquity)}
+              {isPercent ? formatSignedPercent(totalEquityPercent) : formatMoney(currentEquity)}
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted md:justify-end">
               <span>Modal awal: <span className="num text-paper font-medium">{formatMoney(startingBalance)}</span></span>
@@ -211,6 +213,12 @@ export default async function DashboardPage({
               <span className={`num font-medium ${allSummary.netPnl >= 0 ? "text-profit" : "text-loss"}`}>
                 {formatSignedPercent(totalEquityPercent)} ({formatSignedMoney(allSummary.netPnl)})
               </span>
+              {isPercent && (
+                <>
+                  <span>·</span>
+                  <span>Saldo: <span className="num text-paper font-medium">{formatMoney(currentEquity)}</span></span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -259,9 +267,18 @@ export default async function DashboardPage({
         </dl>
       </header>
 
-      {summary.totalTrades === 0 ? (
+      {/* Daily P/L Limit Alert Banner */}
+      <DailyLimitAlert
+        todayPnl={todayPnl}
+        account={fundedAccount ?? activeAccount}
+        startingBalance={startingBalance}
+        tradesToday={dayMap.get(todayKey)?.count ?? 0}
+        className="mx-4 mt-5 md:mx-8"
+      />
+
+      {allTrades.length === 0 ? (
         <Empty
-          title="Belum ada trade di rentang ini"
+          title="Belum ada trade tertutup"
           hint="Catat trade pertamamu. Dasbor ini mengisi sendiri begitu ada data."
           action={{ href: "/input", label: "Catat trade" }}
         />
@@ -271,7 +288,7 @@ export default async function DashboardPage({
           {fundedAccount && (
             <FundedGuard
               account={fundedAccount}
-              currentNetPnl={summary.netPnl}
+              currentNetPnl={allSummary.netPnl}
               todayPnl={todayPnl}
               maxDrawdown={dd.maxDrawdown}
               ddMode={ddMode}
@@ -332,7 +349,7 @@ export default async function DashboardPage({
                       <span>Max Drawdown Statis:</span>
                       <span className={dd.maxDrawdown > 0 ? "text-loss font-medium" : "text-profit font-medium"}>
                         {dd.maxDrawdown > 0
-                          ? `-${dd.maxDrawdownPercent.toFixed(1)}% (${formatSignedMoney(-dd.maxDrawdown)})`
+                          ? `-${dd.maxDrawdownPercent.toFixed(1)}% (${formatMoney(dd.maxDrawdown)})`
                           : "0.0% (Aman)"}
                       </span>
                     </div>
@@ -349,8 +366,10 @@ export default async function DashboardPage({
                   <>
                     <div className="flex justify-between">
                       <span>Max Drawdown Dinamis:</span>
-                      <span className="text-loss font-medium">
-                        -{dd.maxDrawdownPercent.toFixed(1)}% ({formatSignedMoney(-dd.maxDrawdown)})
+                      <span className={dd.maxDrawdown > 0 ? "text-loss font-medium" : "text-profit font-medium"}>
+                        {dd.maxDrawdown > 0
+                          ? `-${dd.maxDrawdownPercent.toFixed(1)}% (${formatMoney(dd.maxDrawdown)})`
+                          : "0.0% (Aman)"}
                       </span>
                     </div>
                     {dd.recoveryFactor !== null && (
@@ -359,6 +378,10 @@ export default async function DashboardPage({
                         <span className="text-paper">{dd.recoveryFactor.toFixed(2)}</span>
                       </div>
                     )}
+                    <div className="flex justify-between">
+                      <span>Sisa Buffer DD (Batas 4%):</span>
+                      <span className="font-semibold text-brass">{formatMoney(dd.remainingBuffer)}</span>
+                    </div>
                   </>
                 )}
               </div>
@@ -423,6 +446,11 @@ export default async function DashboardPage({
                   </div>
                 </div>
               </div>
+            </Panel>
+
+            {/* Performance Heatmap (Annual / 52-Week Grid) */}
+            <Panel className="lg:col-span-3">
+              <PerformanceHeatmap trades={allTrades} startingBalance={startingBalance} />
             </Panel>
 
             {/* Highlights: Best/Worst Pair & Best/Worst Day */}
