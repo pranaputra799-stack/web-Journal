@@ -29,7 +29,7 @@ export default async function PengaturanPage() {
                 const save = updateAccount.bind(null, account.id);
                 const remove = deleteAccount.bind(null, account.id);
                 return (
-                  <form key={account.id} action={save} className="grid gap-4 px-4 py-5 md:grid-cols-4">
+          <form key={account.id} action={save} className="grid gap-3 px-4 py-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
                     <Field label="NAMA">
                       <input name="name" defaultValue={account.name} className="num mt-1.5" />
                     </Field>
@@ -91,7 +91,7 @@ export default async function PengaturanPage() {
 
         <Panel>
           <PanelHead title="Tambah akun" />
-          <form action={createAccount} className="grid gap-4 px-4 py-5 md:grid-cols-4">
+          <form action={createAccount} className="grid gap-3 px-4 py-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
             <Field label="NAMA" hint="Contoh: Funded 50K.">
               <input name="name" required className="num mt-1.5" />
             </Field>

@@ -107,100 +107,98 @@ export default async function DashboardPage({
 
   return (
     <>
-      {/* Tally strip */}
-      <header className="border-b border-line px-5 py-7 md:px-8">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2">
+      {/* ── Tally strip ────────────────────────────────────────── */}
+      <header className="border-b border-line px-4 py-5 md:px-8 md:py-7">
+
+        {/* Filter row — wraps cleanly on narrow screens */}
+        <div className="flex flex-wrap gap-2">
+          {/* Range buttons */}
+          <div className="flex flex-wrap gap-1.5">
             {RANGES.map((option) => (
               <Link
                 key={option.key}
                 href={`/dashboard?rentang=${option.key}&unit=${unit}${params.akun ? `&akun=${params.akun}` : ""}`}
-                className={`num border px-3 py-1.5 text-xs transition-colors ${
+                className={`num border px-3 py-2 text-xs transition-colors ${
                   range === option.key ? "border-brass text-brass bg-brass/5" : "border-line text-muted hover:text-paper"
                 }`}
               >
                 {option.label}
               </Link>
             ))}
-
-            {/* Toggle Satuan: Dollar ($) vs Persen (%) */}
-            <div className="ml-2 flex items-center border border-line p-0.5 text-xs">
-              <Link
-                href={`/dashboard?rentang=${range}&unit=dollar${params.akun ? `&akun=${params.akun}` : ""}`}
-                className={`num px-2.5 py-1 transition-colors ${
-                  !isPercent ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
-                }`}
-              >
-                $ USD
-              </Link>
-              <Link
-                href={`/dashboard?rentang=${range}&unit=persen${params.akun ? `&akun=${params.akun}` : ""}`}
-                className={`num px-2.5 py-1 transition-colors ${
-                  isPercent ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
-                }`}
-              >
-                % Persen
-              </Link>
-            </div>
           </div>
 
+          {/* Unit toggle */}
+          <div className="flex items-center border border-line p-0.5 text-xs">
+            <Link
+              href={`/dashboard?rentang=${range}&unit=dollar${params.akun ? `&akun=${params.akun}` : ""}`}
+              className={`num px-2.5 py-1.5 transition-colors ${
+                !isPercent ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
+              }`}
+            >
+              $
+            </Link>
+            <Link
+              href={`/dashboard?rentang=${range}&unit=persen${params.akun ? `&akun=${params.akun}` : ""}`}
+              className={`num px-2.5 py-1.5 transition-colors ${
+                isPercent ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
+              }`}
+            >
+              %
+            </Link>
+          </div>
+
+          {/* Account selector */}
           {accounts.length > 1 && (
-            <form className="flex items-center gap-2">
+            <form className="flex items-center gap-1.5">
               <input type="hidden" name="rentang" value={range} />
               <input type="hidden" name="unit" value={unit} />
-              <select
-                name="akun"
-                defaultValue={params.akun ?? ""}
-                className="num w-auto text-xs"
-              >
+              <select name="akun" defaultValue={params.akun ?? ""} className="num w-auto text-xs py-2">
                 <option value="">Semua akun</option>
                 {accounts.map((account) => (
-                  <option key={account.id} value={account.id}>
-                    {account.name}
-                  </option>
+                  <option key={account.id} value={account.id}>{account.name}</option>
                 ))}
               </select>
-              <button type="submit" className="num border border-line px-2.5 py-1.5 text-xs text-muted hover:text-paper">
+              <button type="submit" className="num border border-line px-2.5 py-2 text-xs text-muted hover:text-paper">
                 Terapkan
               </button>
             </form>
           )}
         </div>
 
-        <div className="rise mt-6" style={{ "--d": "0ms" } as React.CSSProperties}>
+        {/* Net P/L hero number */}
+        <div className="rise mt-5" style={{ "--d": "0ms" } as React.CSSProperties}>
           <div className="flex items-center gap-3">
-            <span className="num text-[11px] text-muted">
-              NET P/L
-            </span>
+            <span className="num text-[11px] text-muted">NET P/L</span>
             {summary.smallSample && <SmallSampleTag />}
           </div>
-          <div className={`num mt-2 text-4xl leading-none md:text-5xl ${pnlToneClass(netTone)}`}>
+          <div className={`num mt-1.5 text-[2.5rem] leading-none md:text-5xl ${pnlToneClass(netTone)}`}>
             {isPercent ? formatSignedPercent(netPercent) : formatSignedMoney(summary.netPnl)}
           </div>
-          <p className="mt-3 text-sm text-muted">
+          <p className="mt-2 text-sm text-muted">
             {summary.totalTrades} trade tertutup
             {bounds.from && bounds.to
-              ? `, ${formatDateWib(`${bounds.from}T00:00:00+07:00`)} sampai ${formatDateWib(`${bounds.to}T00:00:00+07:00`)}`
+              ? ` · ${formatDateWib(`${bounds.from}T00:00:00+07:00`)} – ${formatDateWib(`${bounds.to}T00:00:00+07:00`)}`
               : ""}
           </p>
         </div>
 
+        {/* Stats grid: 2 col on mobile, 4 on desktop */}
         <dl
-          className="rise mt-7 grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-4"
+          className="rise mt-6 grid grid-cols-2 gap-4 border-t border-line/40 pt-5 md:grid-cols-4"
           style={{ "--d": "90ms" } as React.CSSProperties}
         >
           <Readout
             label="WIN RATE"
             value={summary.winRate === null ? "-" : `${summary.winRate.toFixed(1)}%`}
-            note={`${summary.wins} menang, ${summary.losses} kalah, ${summary.breakEven} BE`}
+            note={`${summary.wins}W ${summary.losses}L ${summary.breakEven}BE`}
           />
           <Readout
             label="PROFIT FACTOR"
             value={summary.profitFactor === null ? "-" : summary.profitFactor.toFixed(2)}
             note={
               isPercent && startingBalance > 0
-                ? `kotor +${((summary.grossProfit / startingBalance) * 100).toFixed(1)}% / -${((summary.grossLoss / startingBalance) * 100).toFixed(1)}%`
-                : `kotor ${formatSignedMoney(summary.grossProfit)} / ${formatSignedMoney(-summary.grossLoss)}`
+                ? `+${((summary.grossProfit / startingBalance) * 100).toFixed(1)}% / -${((summary.grossLoss / startingBalance) * 100).toFixed(1)}%`
+                : `${formatSignedMoney(summary.grossProfit)} / ${formatSignedMoney(-summary.grossLoss)}`
             }
           />
           <Readout
@@ -212,8 +210,8 @@ export default async function DashboardPage({
             }
             note={
               summary.expectancyR === null
-                ? isPercent ? formatSignedMoney(summary.expectancyUsd) : "butuh risk amount untuk R"
-                : `${summary.expectancyR.toFixed(2)}R per trade`
+                ? "–"
+                : `${summary.expectancyR.toFixed(2)}R / trade`
             }
           />
           <Readout
@@ -223,7 +221,7 @@ export default async function DashboardPage({
                 ? "-"
                 : `${streak.current} ${streak.currentKind === "win" ? "menang" : "kalah"}`
             }
-            note={`terpanjang ${streak.longestWin}W / ${streak.longestLoss}L`}
+            note={`maks ${streak.longestWin}W / ${streak.longestLoss}L`}
           />
         </dl>
       </header>
@@ -235,7 +233,7 @@ export default async function DashboardPage({
           action={{ href: "/input", label: "Catat trade" }}
         />
       ) : (
-        <div className="space-y-6 px-5 py-6 md:px-8">
+        <div className="space-y-4 px-4 py-5 md:space-y-6 md:px-8">
           {/* Funded Account Guard if funded account exists */}
           {fundedAccount && (
             <FundedGuard
@@ -246,7 +244,7 @@ export default async function DashboardPage({
             />
           )}
 
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-4 md:gap-6 lg:grid-cols-3">
             <Panel className="lg:col-span-2">
               <PanelHead title="Kurva equity" note={activeAccount ? activeAccount.name : "semua akun"} />
               <EquityChart
@@ -343,7 +341,7 @@ export default async function DashboardPage({
             {/* Highlights: Best/Worst Pair & Best/Worst Day */}
             <Panel className="lg:col-span-2">
               <PanelHead title="Sorotan performa" />
-              <div className="grid grid-cols-2 gap-4 px-4 py-4 md:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 px-4 py-4 sm:grid-cols-4">
                 <div>
                   <span className="num text-[11px] text-muted">PAIR TERBAIK</span>
                   <div className="num mt-1 text-base font-semibold text-profit">

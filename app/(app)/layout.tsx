@@ -15,7 +15,8 @@ export default async function AppLayout({
   return (
     <div className="flex min-h-dvh flex-col md:flex-row">
       <AppNav email={user.email ?? "masuk"} />
-      <main className="min-w-0 flex-1">{children}</main>
+      {/* pb-20 gives clearance for the mobile bottom tab bar */}
+      <main className="min-w-0 flex-1 pb-20 md:pb-0">{children}</main>
     </div>
   );
 }

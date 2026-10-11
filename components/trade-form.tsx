@@ -68,14 +68,14 @@ export function TradeForm({
     "num cursor-pointer border border-line px-3 py-2 text-center text-sm text-muted transition-colors peer-checked:border-brass peer-checked:text-brass peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-brass";
 
   return (
-    <div className="space-y-6 px-5 py-6 md:px-8">
-      {/* Switcher: Form Penuh vs Wizard Langkah demi Langkah */}
-      <div className="flex items-center justify-between border-b border-line pb-4">
+    <div className="space-y-5 px-4 py-5 md:space-y-6 md:px-8">
+      {/* Switcher: Form Penuh vs Wizard */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
         <div className="flex items-center gap-1 border border-line p-0.5 text-xs">
           <button
             type="button"
             onClick={() => setMode("full")}
-            className={`num px-3 py-1 transition-colors ${
+            className={`num px-3 py-1.5 transition-colors ${
               mode === "full" ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
             }`}
           >
@@ -84,11 +84,11 @@ export function TradeForm({
           <button
             type="button"
             onClick={() => setMode("wizard")}
-            className={`num px-3 py-1 transition-colors ${
+            className={`num px-3 py-1.5 transition-colors ${
               mode === "wizard" ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
             }`}
           >
-            Mode Bertahap (Wizard)
+            Mode Bertahap
           </button>
         </div>
 

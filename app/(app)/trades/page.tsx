@@ -51,7 +51,7 @@ export default async function TradesPage({
         }
       />
 
-      <form className="grid gap-4 border-b border-line px-5 py-5 md:grid-cols-6 md:px-8">
+      <form className="grid gap-3 border-b border-line px-4 py-4 sm:grid-cols-2 md:grid-cols-3 md:px-8 lg:grid-cols-6">
         <label className="block">
           <span className="num text-[11px] text-muted">DARI</span>
           <input type="date" name="from" defaultValue={params.from ?? ""} className="num mt-1.5" />

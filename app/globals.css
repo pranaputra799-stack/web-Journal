@@ -154,3 +154,33 @@ textarea:focus {
   background: var(--brass);
   color: var(--brass-ink);
 }
+
+/* Safe-area insets for phones with notch/home-indicator (iPhone, Android) */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Minimum touch target – Apple HIG and Google Material both recommend 44 px.
+   Interactive elements in the app-shell already hit this; this rule catches
+   any stragglers without increasing visual size. */
+button,
+a,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Scrollbar styling for webkit */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 2px;
+}
+
