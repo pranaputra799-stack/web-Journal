@@ -7,15 +7,20 @@ export function FundedGuard({
   currentNetPnl,
   todayPnl,
   maxDrawdown,
+  ddMode = "statis",
+  currentEquity,
 }: {
   account: Account;
   currentNetPnl: number;
   todayPnl: number;
   maxDrawdown: number;
+  ddMode?: "dinamis" | "statis";
+  currentEquity?: number;
 }) {
   const hasTarget = account.profit_target && account.profit_target > 0;
   const hasDailyLimit = account.max_daily_loss && account.max_daily_loss > 0;
-  const hasTotalLoss = account.max_total_loss && account.max_total_loss > 0;
+  const maxTotal = account.max_total_loss || (account.starting_balance ? account.starting_balance * 0.04 : 400);
+  const hasTotalLoss = maxTotal > 0;
 
   if (!hasTarget && !hasDailyLimit && !hasTotalLoss) return null;
 
@@ -36,12 +41,23 @@ export function FundedGuard({
         ? "WASPADA"
         : "AMAN";
 
-  // Total Drawdown Cushion
-  const maxTotal = account.max_total_loss ?? 0;
-  const totalUsedPercent = maxTotal > 0 ? Math.min(100, (maxDrawdown / maxTotal) * 100) : 0;
-  const totalCushion = maxTotal > 0 ? Math.max(0, maxTotal - maxDrawdown) : 0;
+  // Total Drawdown Cushion (Static 4% from initial balance vs Dynamic)
+  const isStatic = ddMode === "statis";
+  const breachLevel = account.starting_balance - maxTotal;
+  const actualEquity = currentEquity ?? (account.starting_balance + currentNetPnl);
+  
+  // In static mode, cushion is equity above breachLevel ($9,600).
+  // In dynamic mode, cushion is maxTotal - maxDrawdown.
+  const totalCushion = isStatic
+    ? Math.max(0, actualEquity - breachLevel)
+    : Math.max(0, maxTotal - maxDrawdown);
+
+  const totalUsedPercent = isStatic
+    ? Math.min(100, (maxDrawdown / maxTotal) * 100)
+    : maxTotal > 0 ? Math.min(100, (maxDrawdown / maxTotal) * 100) : 0;
+
   const totalStatus =
-    maxDrawdown >= maxTotal
+    (isStatic && actualEquity <= breachLevel) || maxDrawdown >= maxTotal
       ? "MELANGGAR"
       : totalUsedPercent >= 75
         ? "WASPADA"
@@ -120,7 +136,9 @@ export function FundedGuard({
         {/* Max Total Drawdown */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="num text-[11px] text-muted">MAX TOTAL LOSS</span>
+            <span className="num text-[11px] text-muted">
+              {isStatic ? "MAX TOTAL LOSS (STATIS 4%)" : "MAX TOTAL LOSS (DINAMIS)"}
+            </span>
             <span
               className={`num text-[10px] px-1.5 py-0.5 font-medium border ${
                 totalStatus === "AMAN"
@@ -142,12 +160,21 @@ export function FundedGuard({
             />
           </div>
           <div className="num flex justify-between text-[11px] text-muted">
-            <span>drawdown {formatSignedMoney(-maxDrawdown)}</span>
-            <span>batas {formatMoney(maxTotal)}</span>
+            <span>{isStatic ? "rugi dari modal" : "drawdown"} {formatSignedMoney(-maxDrawdown)}</span>
+            <span>batas {formatMoney(maxTotal)} (4%)</span>
           </div>
           <p className="num text-[10px] text-muted">
-            Sisa ruang drawdown:{" "}
-            <span className="font-semibold text-paper">{formatMoney(totalCushion)}</span>
+            {isStatic ? (
+              <>
+                Level gagal: <span className="text-paper">{formatMoney(breachLevel)}</span> · Buffer aman:{" "}
+                <span className="font-semibold text-paper">{formatMoney(totalCushion)}</span>
+              </>
+            ) : (
+              <>
+                Sisa ruang drawdown:{" "}
+                <span className="font-semibold text-paper">{formatMoney(totalCushion)}</span>
+              </>
+            )}
           </p>
         </div>
       </div>

@@ -124,6 +124,8 @@ export interface EquityPoint {
   peak: number;
   drawdown: number;
   drawdownPercent: number;
+  staticDrawdown: number;
+  staticDrawdownPercent: number;
   pnl?: number;
   pair?: string;
   direction?: string;
@@ -144,7 +146,8 @@ export function equityCurve(trades: Trade[], startingBalance: number): EquityPoi
   for (const [index, trade] of closed.entries()) {
     equity += trade.profit_loss;
     peak = Math.max(peak, equity);
-    const drawdown = peak - equity;
+    const drawdown = Math.max(0, peak - equity);
+    const staticDrawdown = Math.max(0, startingBalance - equity);
     points.push({
       index,
       time: trade.exit_time ?? trade.entry_time,
@@ -152,6 +155,8 @@ export function equityCurve(trades: Trade[], startingBalance: number): EquityPoi
       peak,
       drawdown,
       drawdownPercent: peak > 0 ? (drawdown / peak) * 100 : 0,
+      staticDrawdown,
+      staticDrawdownPercent: startingBalance > 0 ? (staticDrawdown / startingBalance) * 100 : 0,
       pnl: trade.profit_loss,
       pair: trade.pair,
       direction: trade.direction,
@@ -163,37 +168,81 @@ export function equityCurve(trades: Trade[], startingBalance: number): EquityPoi
   return points;
 }
 
+export type DrawdownMode = "dinamis" | "statis";
+
 export interface DrawdownInfo {
+  mode: DrawdownMode;
   maxDrawdown: number;
   maxDrawdownPercent: number;
   at: string | null;
   current: number;
+  currentPercent: number;
   recoveryFactor: number | null;
+  staticLimitPercent: number;
+  staticLimitAmount: number;
+  staticBreachLevel: number;
+  remainingBuffer: number;
+  bufferPercent: number;
 }
 
-export function drawdown(points: EquityPoint[], netProfit: number): DrawdownInfo {
+export function drawdown(
+  points: EquityPoint[],
+  netProfit: number,
+  mode: DrawdownMode = "dinamis",
+  startingBalance: number = 10000,
+  staticLimitPercent: number = 4,
+): DrawdownInfo {
+  const limitAmount = startingBalance * (staticLimitPercent / 100);
+  const breachLevel = startingBalance - limitAmount;
+
   if (points.length === 0) {
     return {
+      mode,
       maxDrawdown: 0,
       maxDrawdownPercent: 0,
       at: null,
       current: 0,
+      currentPercent: 0,
       recoveryFactor: null,
+      staticLimitPercent,
+      staticLimitAmount: limitAmount,
+      staticBreachLevel: breachLevel,
+      remainingBuffer: limitAmount,
+      bufferPercent: staticLimitPercent,
     };
   }
 
+  const isStatic = mode === "statis";
+
   let worst = points[0];
   for (const point of points) {
-    if (point.drawdown > worst.drawdown) worst = point;
+    const worstVal = isStatic ? point.staticDrawdown : point.drawdown;
+    const curVal = isStatic ? point.staticDrawdown : point.drawdown;
+    if (curVal > worstVal) worst = point;
   }
 
   const last = points[points.length - 1];
+  const maxDd = isStatic ? worst.staticDrawdown : worst.drawdown;
+  const maxDdPercent = isStatic ? worst.staticDrawdownPercent : worst.drawdownPercent;
+  const curDd = isStatic ? last.staticDrawdown : last.drawdown;
+  const curDdPercent = isStatic ? last.staticDrawdownPercent : last.drawdownPercent;
+
+  const remainingBuffer = last.equity - breachLevel;
+  const bufferPercent = startingBalance > 0 ? (remainingBuffer / startingBalance) * 100 : 0;
+
   return {
-    maxDrawdown: worst.drawdown,
-    maxDrawdownPercent: worst.drawdownPercent,
+    mode,
+    maxDrawdown: maxDd,
+    maxDrawdownPercent: maxDdPercent,
     at: worst.time,
-    current: last.drawdown,
-    recoveryFactor: worst.drawdown > 0 ? netProfit / worst.drawdown : null,
+    current: curDd,
+    currentPercent: curDdPercent,
+    recoveryFactor: maxDd > 0 ? netProfit / maxDd : null,
+    staticLimitPercent,
+    staticLimitAmount: limitAmount,
+    staticBreachLevel: breachLevel,
+    remainingBuffer,
+    bufferPercent,
   };
 }
 

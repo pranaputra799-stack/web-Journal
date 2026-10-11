@@ -45,9 +45,14 @@ export function EquityChart({
     return <Placeholder note="Butuh minimal 2 trade tertutup untuk menggambar kurva." />;
   }
 
-  const w = 800;
+  const w = 840;
   const h = 220;
-  const pad = 12;
+  const padLeft = 14;
+  const padRight = 75; // Right gutter for scale & current equity tag
+  const padTop = 14;
+  const padBottom = 16;
+  const plotWidth = w - padLeft - padRight;
+  const plotHeight = h - padTop - padBottom;
 
   // Percent returns relative to base
   const isPercent = currentUnit === "percent";
@@ -60,13 +65,13 @@ export function EquityChart({
   const max = Math.max(...values, baseValue);
   const range = max - min || 1;
 
-  const x = (index: number) => pad + (index / (points.length - 1)) * (w - pad * 2);
-  const y = (val: number) => pad + (1 - (val - min) / range) * (h - pad * 2);
+  const x = (index: number) => padLeft + (index / (points.length - 1)) * plotWidth;
+  const y = (val: number) => padTop + (1 - (val - min) / range) * plotHeight;
 
   const line = points
     .map((p, index) => `${index === 0 ? "M" : "L"} ${x(index).toFixed(1)} ${y(getPointValue(p)).toFixed(1)}`)
     .join(" ");
-  const area = `${line} L ${x(points.length - 1).toFixed(1)} ${h - pad} L ${x(0).toFixed(1)} ${h - pad} Z`;
+  const area = `${line} L ${x(points.length - 1).toFixed(1)} ${h - padBottom} L ${x(0).toFixed(1)} ${h - padBottom} Z`;
 
   const lastPoint = points[points.length - 1];
   const lastValue = values[values.length - 1];
@@ -82,7 +87,8 @@ export function EquityChart({
   const handlePointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const relativeX = (e.clientX - rect.left) / rect.width;
-    const clampedRatio = Math.max(0, Math.min(1, (relativeX * w - pad) / (w - pad * 2)));
+    const currentSvgX = relativeX * w;
+    const clampedRatio = Math.max(0, Math.min(1, (currentSvgX - padLeft) / plotWidth));
     const targetIndex = Math.round(clampedRatio * (points.length - 1));
     setHoverIndex(Math.max(0, Math.min(points.length - 1, targetIndex)));
   };
@@ -91,11 +97,14 @@ export function EquityChart({
     setHoverIndex(null);
   };
 
+  const lastPercent = base > 0 ? ((lastPoint.equity - base) / base) * 100 : 0;
+  const currentBadgeY = Math.max(padTop + 10, Math.min(h - padBottom - 10, y(lastValue)));
+
   return (
     <div className="relative px-4 py-4 select-none">
       <div className="mb-2 flex items-center justify-between">
         <span className="num text-[11px] text-muted">
-          {isPercent ? "Mode Persen (%) dari saldo awal" : "Mode Dollar ($) akumulasi equity"}
+          {isPercent ? "Mode Persen (%) dari saldo awal" : "Mode Dollar ($) akumulasi equity"} · Skala kanan
         </span>
         <div className="flex items-center gap-1 border border-line p-0.5 text-[11px]">
           <button
@@ -131,19 +140,63 @@ export function EquityChart({
         >
           <defs>
             <clipPath id={clipId}>
-              <rect x={pad} y={pad} width={w - pad * 2} height={h - pad * 2} />
+              <rect x={padLeft} y={padTop} width={plotWidth} height={plotHeight} />
             </clipPath>
           </defs>
 
+          {/* Right Y-axis boundary line */}
+          <line
+            x1={w - padRight}
+            x2={w - padRight}
+            y1={padTop}
+            y2={h - padBottom}
+            stroke="var(--line)"
+            strokeDasharray="2 2"
+            opacity="0.6"
+          />
+
           {/* Baseline at the starting balance or 0% */}
           <line
-            x1={pad}
-            x2={w - pad}
+            x1={padLeft}
+            x2={w - padRight}
             y1={y(baseValue)}
             y2={y(baseValue)}
             stroke="var(--line)"
             strokeDasharray="4 4"
           />
+
+          {/* Right scale tick labels */}
+          <text
+            x={w - padRight + 5}
+            y={padTop + 9}
+            fill="var(--muted)"
+            fontSize="9"
+            className="num"
+          >
+            {isPercent ? `+${max.toFixed(1)}%` : formatMoney(max)}
+          </text>
+
+          <text
+            x={w - padRight + 5}
+            y={Math.min(h - padBottom - 18, Math.max(padTop + 24, y(baseValue) + 3))}
+            fill="var(--muted)"
+            fontSize="9"
+            className="num"
+          >
+            {isPercent ? "0.0%" : formatMoney(base)}
+          </text>
+
+          {min < baseValue && (
+            <text
+              x={w - padRight + 5}
+              y={h - padBottom - 2}
+              fill="var(--loss)"
+              fontSize="9"
+              className="num"
+            >
+              {isPercent ? `${min.toFixed(1)}%` : formatMoney(min)}
+            </text>
+          )}
 
           {/* Area & Stroke */}
           <path d={area} fill={stroke} opacity="0.08" />
@@ -155,14 +208,48 @@ export function EquityChart({
             vectorEffect="non-scaling-stroke"
           />
 
+          {/* Leader line to right edge for current equity */}
+          <line
+            x1={x(points.length - 1)}
+            x2={w - padRight}
+            y1={y(lastValue)}
+            y2={y(lastValue)}
+            stroke={stroke}
+            strokeDasharray="2 2"
+            strokeWidth="1"
+            opacity="0.8"
+          />
+
+          {/* Prominent Current Equity Badge on the Right Margin */}
+          <g transform={`translate(${w - padRight + 3}, ${currentBadgeY - 10})`}>
+            <rect
+              width={padRight - 6}
+              height={20}
+              rx={3}
+              fill="var(--ink)"
+              stroke={stroke}
+              strokeWidth="1.25"
+            />
+            <text
+              x={(padRight - 6) / 2}
+              y={13.5}
+              textAnchor="middle"
+              fill={stroke}
+              fontSize="9.5"
+              className="num font-semibold"
+            >
+              {isPercent ? formatSignedPercent(lastPercent) : formatMoney(lastPoint.equity)}
+            </text>
+          </g>
+
           {/* Interactive Guide Hairline and Indicator Dot */}
           {hovered && (
             <g>
               <line
                 x1={hoveredX}
                 x2={hoveredX}
-                y1={pad}
-                y2={h - pad}
+                y1={padTop}
+                y2={h - padBottom}
                 stroke="var(--brass)"
                 strokeWidth="1"
                 strokeDasharray="3 3"
@@ -252,7 +339,7 @@ export function EquityChart({
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted">Drawdown:</span>
+                  <span className="text-muted">DD Puncak:</span>
                   <span className="num text-loss">
                     {hovered.drawdown > 0
                       ? `${formatSignedMoney(-hovered.drawdown)} (-${hovered.drawdownPercent.toFixed(1)}%)`
@@ -268,15 +355,15 @@ export function EquityChart({
         )}
       </div>
 
-      <div className="num mt-2 flex justify-between text-[11px] text-muted">
+      <div className="num mt-2 flex flex-wrap justify-between gap-2 text-[11px] text-muted">
         <span>
-          mulai {isPercent ? "0.00%" : formatSignedMoney(base)}
+          Modal awal: <span className="text-paper">{isPercent ? "0.00%" : formatSignedMoney(base)}</span>
         </span>
-        <span>
-          sekarang{" "}
-          {isPercent
-            ? formatSignedPercent(base > 0 ? ((lastPoint.equity - base) / base) * 100 : 0)
-            : formatSignedMoney(lastPoint.equity)}{" "}
+        <span className="font-medium text-brass">
+          Equity sekarang:{" "}
+          <span className="text-paper">
+            {isPercent ? formatSignedPercent(lastPercent) : formatSignedMoney(lastPoint.equity)}
+          </span>{" "}
           ({formatSignedMoney(lastPoint.equity - base)})
         </span>
       </div>
@@ -287,19 +374,35 @@ export function EquityChart({
 export function DrawdownChart({
   points,
   unit = "dollar",
+  mode = "statis",
+  base = 10000,
+  staticLimitPercent = 4,
   onUnitChange,
+  onModeChange,
 }: {
   points: EquityPoint[];
   unit?: "dollar" | "percent";
+  mode?: "dinamis" | "statis";
+  base?: number;
+  staticLimitPercent?: number;
   onUnitChange?: (unit: "dollar" | "percent") => void;
+  onModeChange?: (mode: "dinamis" | "statis") => void;
 }) {
   const [internalUnit, setInternalUnit] = useState<"dollar" | "percent">(unit);
+  const [internalMode, setInternalMode] = useState<"dinamis" | "statis">(mode);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   const currentUnit = onUnitChange ? unit : internalUnit;
+  const currentMode = onModeChange ? mode : internalMode;
+
   const toggleUnit = (next: "dollar" | "percent") => {
     if (onUnitChange) onUnitChange(next);
     else setInternalUnit(next);
+  };
+
+  const toggleMode = (next: "dinamis" | "statis") => {
+    if (onModeChange) onModeChange(next);
+    else setInternalMode(next);
   };
 
   if (points.length < 2) {
@@ -307,15 +410,30 @@ export function DrawdownChart({
   }
 
   const isPercent = currentUnit === "percent";
+  const isStatic = currentMode === "statis";
   const w = 800;
   const h = 180;
   const pad = 12;
 
-  const maxDdMoney = Math.max(...points.map((p) => p.drawdown), 0.01);
-  const maxDdPercent = Math.max(...points.map((p) => p.drawdownPercent), 0.01);
-  const scaleMax = isPercent ? maxDdPercent : maxDdMoney;
+  // Threshold limit for static mode: 4% of initial balance
+  const staticLimitAmount = base * (staticLimitPercent / 100);
+  const staticBreachLevel = base - staticLimitAmount;
+  const thresholdVal = isPercent ? staticLimitPercent : staticLimitAmount;
 
-  const getDdValue = (p: EquityPoint) => (isPercent ? p.drawdownPercent : p.drawdown);
+  // Drawdown points by mode
+  const getDdValue = (p: EquityPoint) => {
+    if (isStatic) {
+      return isPercent ? p.staticDrawdownPercent : p.staticDrawdown;
+    }
+    return isPercent ? p.drawdownPercent : p.drawdown;
+  };
+
+  const ddValues = points.map(getDdValue);
+  const maxActualDd = Math.max(...ddValues, 0.01);
+  // Ensure the scale accommodates the 4% static threshold so the guideline is nicely visible
+  const scaleMax = isStatic
+    ? Math.max(thresholdVal * 1.15, maxActualDd * 1.05)
+    : Math.max(maxActualDd, 0.01);
 
   const x = (index: number) => pad + (index / (points.length - 1)) * (w - pad * 2);
   const y = (val: number) => pad + (val / scaleMax) * (h - pad * 2);
@@ -349,12 +467,37 @@ export function DrawdownChart({
     setHoverIndex(null);
   };
 
+  const lastPoint = points[points.length - 1];
+  const lastEquity = lastPoint.equity;
+  const currentBufferToBreach = lastEquity - staticBreachLevel;
+
   return (
     <div className="relative px-4 py-4 select-none">
-      <div className="mb-2 flex items-center justify-between">
-        <span className="num text-[11px] text-muted">
-          {isPercent ? "Drawdown dalam Persen (%) dari puncak" : "Drawdown dalam Dollar ($)"}
-        </span>
+      {/* Controls row: Mode (Statis/Dinamis) & Unit ($/%) */}
+      <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center border border-line p-0.5 text-[11px]">
+          <button
+            type="button"
+            onClick={() => toggleMode("statis")}
+            title="Max DD dihitung dari Saldo Awal (Batas 4%)"
+            className={`num px-2 py-0.5 transition-colors ${
+              isStatic ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
+            }`}
+          >
+            Statis (4% Saldo)
+          </button>
+          <button
+            type="button"
+            onClick={() => toggleMode("dinamis")}
+            title="Max DD dihitung trailing dari Puncak Tertinggi"
+            className={`num px-2 py-0.5 transition-colors ${
+              !isStatic ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
+            }`}
+          >
+            Dinamis (Puncak)
+          </button>
+        </div>
+
         <div className="flex items-center gap-1 border border-line p-0.5 text-[11px]">
           <button
             type="button"
@@ -383,7 +526,11 @@ export function DrawdownChart({
           className="h-40 w-full cursor-crosshair touch-none"
           preserveAspectRatio="none"
           role="img"
-          aria-label="Grafik drawdown dari puncak equity"
+          aria-label={
+            isStatic
+              ? "Grafik drawdown statis dari modal awal dengan batas 4%"
+              : "Grafik drawdown dinamis dari puncak equity"
+          }
           onPointerMove={handlePointerMove}
           onPointerLeave={handlePointerLeave}
         >
@@ -396,6 +543,32 @@ export function DrawdownChart({
             stroke="var(--line)"
             strokeDasharray="4 4"
           />
+
+          {/* Static 4% Threshold Breach Line */}
+          {isStatic && (
+            <g>
+              <line
+                x1={pad}
+                x2={w - pad}
+                y1={y(thresholdVal)}
+                y2={y(thresholdVal)}
+                stroke="var(--loss)"
+                strokeDasharray="4 4"
+                strokeWidth="1.25"
+                opacity="0.85"
+              />
+              <text
+                x={w - pad}
+                y={Math.max(pad + 11, y(thresholdVal) - 4)}
+                textAnchor="end"
+                fill="var(--loss)"
+                fontSize="9.5"
+                className="num font-semibold"
+              >
+                Batas 4% Max DD ({isPercent ? "-4.0%" : formatSignedMoney(-staticLimitAmount)})
+              </text>
+            </g>
+          )}
 
           <path
             d={area}
@@ -449,7 +622,7 @@ export function DrawdownChart({
               transform: tooltipFlip ? "translateX(-105%)" : "translateX(5%)",
             }}
           >
-            <div className="panel-surface min-w-[200px] border border-line bg-ink/95 p-3 shadow-xl backdrop-blur-md">
+            <div className="panel-surface min-w-[210px] border border-line bg-ink/95 p-3 shadow-xl backdrop-blur-md">
               <div className="flex items-center justify-between border-b border-line/60 pb-1.5">
                 <span className="num text-xs font-semibold text-brass">
                   Trade #{hovered.index + 1}
@@ -459,26 +632,59 @@ export function DrawdownChart({
                 </span>
               </div>
               <div className="mt-2 space-y-1 text-xs">
+                {isStatic ? (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-muted">DD Statis:</span>
+                      <span className={`num font-semibold ${hovered.staticDrawdown > 0 ? "text-loss" : "text-profit"}`}>
+                        {hovered.staticDrawdown > 0
+                          ? `${formatSignedMoney(-hovered.staticDrawdown)} (-${hovered.staticDrawdownPercent.toFixed(2)}%)`
+                          : "0.00% (Aman)"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted">Batas 4%:</span>
+                      <span className="num text-loss font-medium">
+                        {formatSignedMoney(-staticLimitAmount)} ({formatMoney(staticBreachLevel)})
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted">Buffer Gagal:</span>
+                      <span className="num text-paper font-medium">
+                        {formatMoney(hovered.equity - staticBreachLevel)}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-muted">DD Puncak:</span>
+                      <span className="num font-semibold text-loss">
+                        {formatSignedMoney(-hovered.drawdown)} (-${hovered.drawdownPercent.toFixed(2)}%)
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted">Puncak Saldo:</span>
+                      <span className="num text-paper font-medium">
+                        {formatMoney(hovered.peak)}
+                      </span>
+                    </div>
+                  </>
+                )}
                 <div className="flex justify-between">
-                  <span className="text-muted">Drawdown:</span>
-                  <span className="num font-semibold text-loss">
-                    {formatSignedMoney(-hovered.drawdown)} (-{hovered.drawdownPercent.toFixed(2)}%)
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted">Puncak Saldo:</span>
-                  <span className="num text-paper font-medium">
-                    {formatMoney(hovered.peak)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted">Saldo Saat Ini:</span>
+                  <span className="text-muted">Saldo Trade Ini:</span>
                   <span className="num text-paper font-medium">
                     {formatMoney(hovered.equity)}
                   </span>
                 </div>
                 <div className="border-t border-line/60 pt-1 text-[10px] text-muted">
-                  {hovered.drawdown === 0 ? "Titik tertinggi (All-Time High)" : "Sedang dalam penurunan"}
+                  {isStatic
+                    ? hovered.staticDrawdown === 0
+                      ? "Saldo di atas modal awal"
+                      : "Saldo di bawah modal awal"
+                    : hovered.drawdown === 0
+                      ? "Titik tertinggi (All-Time High)"
+                      : "Sedang dalam penurunan dari puncak"}
                 </div>
               </div>
             </div>
@@ -486,14 +692,22 @@ export function DrawdownChart({
         )}
       </div>
 
-      <div className="num mt-2 flex justify-between text-[11px] text-muted">
-        <span>0</span>
+      <div className="num mt-2 flex flex-wrap justify-between gap-1 text-[11px] text-muted">
         <span>
-          terdalam{" "}
-          {isPercent
-            ? `-${maxDdPercent.toFixed(1)}%`
-            : formatSignedMoney(-maxDdMoney)}{" "}
-          ({isPercent ? formatSignedMoney(-maxDdMoney) : `-${maxDdPercent.toFixed(1)}%`})
+          {isStatic
+            ? `Batas 4%: ${formatMoney(staticLimitAmount)} (Level gagal ${formatMoney(staticBreachLevel)})`
+            : "0% (Puncak)"}
+        </span>
+        <span>
+          {isStatic ? (
+            <span className="text-brass">
+              Buffer aman: <span className="font-semibold text-paper">{formatMoney(currentBufferToBreach)}</span>
+            </span>
+          ) : (
+            <span>
+              terdalam {isPercent ? `-${maxActualDd.toFixed(1)}%` : formatSignedMoney(-maxActualDd)}
+            </span>
+          )}
         </span>
       </div>
     </div>

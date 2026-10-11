@@ -15,7 +15,7 @@ import {
 import { listAccounts, listTrades } from "@/lib/queries";
 import { dailyPnl, drawdown, equityCurve, streaks, summarise } from "@/lib/stats";
 
-type SearchParams = Promise<{ rentang?: string; akun?: string; unit?: string }>;
+type SearchParams = Promise<{ rentang?: string; akun?: string; unit?: string; dd?: string }>;
 
 const RANGES = [
   { key: "bulan", label: "Bulan ini" },
@@ -47,6 +47,7 @@ export default async function DashboardPage({
   const params = await searchParams;
   const range = params.rentang ?? "bulan";
   const unit = params.unit === "persen" ? "persen" : "dollar";
+  const ddMode = params.dd === "dinamis" ? "dinamis" : "statis";
   const bounds = rangeBounds(range);
 
   const [accounts, trades] = await Promise.all([
@@ -57,11 +58,12 @@ export default async function DashboardPage({
   const summary = summarise(trades);
   const activeAccount = accounts.find((account) => account.id === params.akun);
   const startingBalance =
-    activeAccount?.starting_balance ??
-    accounts.reduce((sum, account) => sum + account.starting_balance, 0);
+    (activeAccount?.starting_balance ??
+      accounts.reduce((sum, account) => sum + account.starting_balance, 0)) || 10000;
 
   const points = equityCurve(trades, startingBalance);
-  const dd = drawdown(points, summary.netPnl);
+  const dd = drawdown(points, summary.netPnl, ddMode, startingBalance, 4);
+  const currentEquity = points.length > 0 ? points[points.length - 1].equity : startingBalance;
   const streak = streaks(trades);
 
   const dayMap = dailyPnl(trades, dayKeyWib, (trade) => trade.exit_time ?? trade.entry_time);
@@ -117,7 +119,7 @@ export default async function DashboardPage({
             {RANGES.map((option) => (
               <Link
                 key={option.key}
-                href={`/dashboard?rentang=${option.key}&unit=${unit}${params.akun ? `&akun=${params.akun}` : ""}`}
+                href={`/dashboard?rentang=${option.key}&unit=${unit}&dd=${ddMode}${params.akun ? `&akun=${params.akun}` : ""}`}
                 className={`num border px-3 py-2 text-xs transition-colors ${
                   range === option.key ? "border-brass text-brass bg-brass/5" : "border-line text-muted hover:text-paper"
                 }`}
@@ -130,7 +132,7 @@ export default async function DashboardPage({
           {/* Unit toggle */}
           <div className="flex items-center border border-line p-0.5 text-xs">
             <Link
-              href={`/dashboard?rentang=${range}&unit=dollar${params.akun ? `&akun=${params.akun}` : ""}`}
+              href={`/dashboard?rentang=${range}&unit=dollar&dd=${ddMode}${params.akun ? `&akun=${params.akun}` : ""}`}
               className={`num px-2.5 py-1.5 transition-colors ${
                 !isPercent ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
               }`}
@@ -138,7 +140,7 @@ export default async function DashboardPage({
               $
             </Link>
             <Link
-              href={`/dashboard?rentang=${range}&unit=persen${params.akun ? `&akun=${params.akun}` : ""}`}
+              href={`/dashboard?rentang=${range}&unit=persen&dd=${ddMode}${params.akun ? `&akun=${params.akun}` : ""}`}
               className={`num px-2.5 py-1.5 transition-colors ${
                 isPercent ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
               }`}
@@ -152,6 +154,7 @@ export default async function DashboardPage({
             <form className="flex items-center gap-1.5">
               <input type="hidden" name="rentang" value={range} />
               <input type="hidden" name="unit" value={unit} />
+              <input type="hidden" name="dd" value={ddMode} />
               <select name="akun" defaultValue={params.akun ?? ""} className="num w-auto text-xs py-2">
                 <option value="">Semua akun</option>
                 {accounts.map((account) => (
@@ -165,26 +168,50 @@ export default async function DashboardPage({
           )}
         </div>
 
-        {/* Net P/L hero number */}
-        <div className="rise mt-5" style={{ "--d": "0ms" } as React.CSSProperties}>
-          <div className="flex items-center gap-3">
-            <span className="num text-[11px] text-muted">NET P/L</span>
-            {summary.smallSample && <SmallSampleTag />}
+        {/* Hero Row: Left = NET P/L, Right = TOTAL EQUITY / SALDO SAAT INI */}
+        <div
+          className="rise mt-5 flex flex-col justify-between gap-5 border-b border-line/40 pb-5 md:flex-row md:items-end"
+          style={{ "--d": "0ms" } as React.CSSProperties}
+        >
+          {/* Left: Net P/L */}
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="num text-[11px] text-muted tracking-wider">NET P/L</span>
+              {summary.smallSample && <SmallSampleTag />}
+            </div>
+            <div className={`num mt-1.5 text-[2.5rem] leading-none md:text-5xl ${pnlToneClass(netTone)}`}>
+              {isPercent ? formatSignedPercent(netPercent) : formatSignedMoney(summary.netPnl)}
+            </div>
+            <p className="mt-2 text-sm text-muted">
+              {summary.totalTrades} trade tertutup
+              {bounds.from && bounds.to
+                ? ` · ${formatDateWib(`${bounds.from}T00:00:00+07:00`)} – ${formatDateWib(`${bounds.to}T00:00:00+07:00`)}`
+                : ""}
+            </p>
           </div>
-          <div className={`num mt-1.5 text-[2.5rem] leading-none md:text-5xl ${pnlToneClass(netTone)}`}>
-            {isPercent ? formatSignedPercent(netPercent) : formatSignedMoney(summary.netPnl)}
+
+          {/* Right: Total Equity / Saldo Saat Ini */}
+          <div className="flex flex-col md:items-end border-t border-line/40 pt-4 md:border-0 md:pt-0">
+            <div className="flex items-center gap-2">
+              <span className="num text-[11px] text-muted tracking-wider">TOTAL EQUITY · SALDO SAAT INI</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-brass animate-pulse" />
+            </div>
+            <div className="num mt-1.5 text-2xl font-semibold text-paper md:text-4xl">
+              {formatMoney(currentEquity)}
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted md:justify-end">
+              <span>Modal awal: <span className="num text-paper font-medium">{formatMoney(startingBalance)}</span></span>
+              <span>·</span>
+              <span className={`num font-medium ${summary.netPnl >= 0 ? "text-profit" : "text-loss"}`}>
+                {formatSignedPercent(netPercent)} ({formatSignedMoney(summary.netPnl)})
+              </span>
+            </div>
           </div>
-          <p className="mt-2 text-sm text-muted">
-            {summary.totalTrades} trade tertutup
-            {bounds.from && bounds.to
-              ? ` · ${formatDateWib(`${bounds.from}T00:00:00+07:00`)} – ${formatDateWib(`${bounds.to}T00:00:00+07:00`)}`
-              : ""}
-          </p>
         </div>
 
         {/* Stats grid: 2 col on mobile, 4 on desktop */}
         <dl
-          className="rise mt-6 grid grid-cols-2 gap-4 border-t border-line/40 pt-5 md:grid-cols-4"
+          className="rise mt-6 grid grid-cols-2 gap-4 pt-1 md:grid-cols-4"
           style={{ "--d": "90ms" } as React.CSSProperties}
         >
           <Readout
@@ -241,6 +268,8 @@ export default async function DashboardPage({
               currentNetPnl={summary.netPnl}
               todayPnl={todayPnl}
               maxDrawdown={dd.maxDrawdown}
+              ddMode={ddMode}
+              currentEquity={currentEquity}
             />
           )}
 
@@ -255,26 +284,78 @@ export default async function DashboardPage({
             </Panel>
 
             <Panel>
-              <PanelHead
-                title="Drawdown"
-                note={
-                  dd.maxDrawdown > 0
-                    ? isPercent
-                      ? `maks -${dd.maxDrawdownPercent.toFixed(1)}%`
-                      : `maks ${formatSignedMoney(-dd.maxDrawdown)}`
-                    : "belum ada"
-                }
-              />
+              <div className="flex flex-wrap items-center justify-between border-b border-line px-4 py-3">
+                <div>
+                  <h2 className="text-sm font-medium">Drawdown</h2>
+                  <p className="num text-[11px] text-muted">
+                    {ddMode === "statis"
+                      ? `Batas 4% Modal (${formatMoney(dd.staticLimitAmount)})`
+                      : `Trailing dari puncak`}
+                  </p>
+                </div>
+                <div className="flex items-center border border-line p-0.5 text-xs">
+                  <Link
+                    href={`/dashboard?rentang=${range}&unit=${unit}&dd=statis${params.akun ? `&akun=${params.akun}` : ""}`}
+                    className={`num px-2 py-0.5 transition-colors ${
+                      ddMode === "statis" ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
+                    }`}
+                  >
+                    Statis (4%)
+                  </Link>
+                  <Link
+                    href={`/dashboard?rentang=${range}&unit=${unit}&dd=dinamis${params.akun ? `&akun=${params.akun}` : ""}`}
+                    className={`num px-2 py-0.5 transition-colors ${
+                      ddMode === "dinamis" ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
+                    }`}
+                  >
+                    Dinamis
+                  </Link>
+                </div>
+              </div>
               <DrawdownChart
                 points={points}
                 unit={isPercent ? "percent" : "dollar"}
+                mode={ddMode}
+                base={startingBalance}
+                staticLimitPercent={4}
               />
-              {dd.maxDrawdownPercent > 0 && (
-                <p className="num border-t border-line px-4 py-3 text-[11px] text-muted">
-                  {dd.maxDrawdownPercent.toFixed(1)}% dari puncak ({formatSignedMoney(-dd.maxDrawdown)})
-                  {dd.recoveryFactor !== null ? `, recovery factor ${dd.recoveryFactor.toFixed(2)}` : ""}
-                </p>
-              )}
+              <div className="num border-t border-line px-4 py-3 text-[11px] text-muted space-y-1">
+                {ddMode === "statis" ? (
+                  <>
+                    <div className="flex justify-between">
+                      <span>Max Drawdown Statis:</span>
+                      <span className={dd.maxDrawdown > 0 ? "text-loss font-medium" : "text-profit font-medium"}>
+                        {dd.maxDrawdown > 0
+                          ? `-${dd.maxDrawdownPercent.toFixed(1)}% (${formatSignedMoney(-dd.maxDrawdown)})`
+                          : "0.0% (Aman)"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Level Batas Gagal (4%):</span>
+                      <span className="text-paper">{formatMoney(dd.staticBreachLevel)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Sisa Ruang Aman:</span>
+                      <span className="font-semibold text-brass">{formatMoney(dd.remainingBuffer)}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex justify-between">
+                      <span>Max Drawdown Dinamis:</span>
+                      <span className="text-loss font-medium">
+                        -{dd.maxDrawdownPercent.toFixed(1)}% ({formatSignedMoney(-dd.maxDrawdown)})
+                      </span>
+                    </div>
+                    {dd.recoveryFactor !== null && (
+                      <div className="flex justify-between">
+                        <span>Recovery Factor:</span>
+                        <span className="text-paper">{dd.recoveryFactor.toFixed(2)}</span>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
             </Panel>
 
             <Panel className="lg:col-span-2">

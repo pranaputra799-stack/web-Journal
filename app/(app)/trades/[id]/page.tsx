@@ -11,7 +11,7 @@ import {
   formatSignedMoney,
   pnlClass,
 } from "@/lib/format";
-import { getTrade, listScreenshots, signedScreenshotUrls } from "@/lib/queries";
+import { getTrade, listAccounts, listScreenshots, signedScreenshotUrls } from "@/lib/queries";
 
 type Params = Promise<{ id: string }>;
 
@@ -26,8 +26,12 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
 
 export default async function TradeDetailPage({ params }: { params: Params }) {
   const { id } = await params;
-  const trade = await getTrade(id);
+  const [trade, accounts] = await Promise.all([getTrade(id), listAccounts()]);
   if (!trade) notFound();
+
+  const activeAcc = accounts.find((a) => a.id === trade.account_id);
+  const startingBalance = activeAcc?.starting_balance ?? 10000;
+  const pct = startingBalance > 0 ? (trade.profit_loss / startingBalance) * 100 : 0;
 
   const screenshots = await listScreenshots(trade.id);
   const urls = await signedScreenshotUrls(screenshots.map((shot) => shot.file_path));
@@ -69,15 +73,19 @@ export default async function TradeDetailPage({ params }: { params: Params }) {
         <Panel className="md:col-span-2">
           <PanelHead title="Ringkasan trade" note={trade.status} />
           <div className="px-4 py-3">
-            <div className="num mb-4 text-3xl">
+            <div className="num mb-4 flex flex-wrap items-baseline gap-3 text-3xl">
               <span className={pnlClass(trade.profit_loss)}>
                 {formatSignedMoney(trade.profit_loss)}
               </span>
-              <span className="ml-3 text-sm text-muted">
+              <span className={`text-xl font-medium ${pnlClass(trade.profit_loss)}`}>
+                ({pct >= 0 ? "+" : ""}{pct.toFixed(2)}%)
+              </span>
+              <span className="text-sm text-muted">
                 {trade.r_multiple === null ? "" : `${trade.r_multiple.toFixed(2)}R`}
               </span>
             </div>
             <Row label="HASIL" value={trade.result} />
+            <Row label="RETURN AKUN" value={`${pct >= 0 ? "+" : ""}${pct.toFixed(2)}% (modal ${formatMoney(startingBalance)})`} />
             <Row label="EXIT" value={trade.exit_time ? `${formatDateTimeWib(trade.exit_time)} WIB` : "masih terbuka"} />
             <Row label="ENTRY PRICE" value={formatNumber(trade.entry_price)} />
             <Row label="EXIT PRICE" value={formatNumber(trade.exit_price)} />

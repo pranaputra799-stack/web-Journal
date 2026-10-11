@@ -3,7 +3,7 @@ import Link from "next/link";
 import { CalendarView } from "@/components/calendar-view";
 import { PageHeader, Panel } from "@/components/ui";
 import { dayKeyWib, formatDateWib, formatSignedMoney as money } from "@/lib/format";
-import { listTrades } from "@/lib/queries";
+import { listAccounts, listTrades } from "@/lib/queries";
 import { summarise } from "@/lib/stats";
 
 type SearchParams = Promise<{ bulan?: string }>;
@@ -51,10 +51,15 @@ export default async function CalendarPage({
   const year = Number(yearText) || Number(todayKey.slice(0, 4));
   const month = Number(monthText) || Number(todayKey.slice(5, 7));
 
-  const trades = await listTrades({
-    from: `${monthParam}-01`,
-    to: `${monthParam}-31`,
-  });
+  const [trades, accounts] = await Promise.all([
+    listTrades({
+      from: `${monthParam}-01`,
+      to: `${monthParam}-31`,
+    }),
+    listAccounts(),
+  ]);
+
+  const startingBalance = accounts.reduce((sum, a) => sum + a.starting_balance, 0) || 10000;
 
   const byDay = new Map<string, { pnl: number; count: number }>();
   for (const trade of trades) {
@@ -101,6 +106,9 @@ export default async function CalendarPage({
             <span className="text-[11px] text-muted">TOTAL BULAN</span>
             <span className={`ml-3 text-xl ${summary.netPnl > 0 ? "text-profit" : summary.netPnl < 0 ? "text-loss" : "text-flat"}`}>
               {money(summary.netPnl)}
+              <span className="ml-1.5 text-xs opacity-75">
+                ({summary.netPnl >= 0 ? "+" : ""}{((summary.netPnl / startingBalance) * 100).toFixed(2)}%)
+              </span>
             </span>
           </div>
           <div>
@@ -127,6 +135,7 @@ export default async function CalendarPage({
               trades={trades}
               todayKey={todayKey}
               peak={peak}
+              startingBalance={startingBalance}
             />
           </div>
         </Panel>

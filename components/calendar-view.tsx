@@ -27,14 +27,18 @@ export function CalendarView({
   trades,
   todayKey,
   peak,
+  startingBalance = 10000,
 }: {
   weeks: (Cell | null)[][];
   byDay: Map<string, DayData>;
   trades: Trade[];
   todayKey: string;
   peak: number;
+  startingBalance?: number;
 }) {
   const [selectedDayKey, setSelectedDayKey] = useState<string | null>(null);
+  const [unit, setUnit] = useState<"dollar" | "percent">("dollar");
+  const isPercent = unit === "percent";
 
   const selectedTrades = selectedDayKey
     ? trades.filter((t) => {
@@ -54,6 +58,33 @@ export function CalendarView({
 
   return (
     <>
+      {/* Unit switch bar */}
+      <div className="flex items-center justify-between border-b border-line px-3 py-2 bg-ink/30">
+        <span className="num text-[11px] text-muted">
+          Mode kalender: {isPercent ? "Persentase (%) dari saldo modal" : "Nominal ($ USD)"}
+        </span>
+        <div className="flex items-center border border-line p-0.5 text-[11px]">
+          <button
+            type="button"
+            onClick={() => setUnit("dollar")}
+            className={`num px-2.5 py-0.5 transition-colors ${
+              !isPercent ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
+            }`}
+          >
+            $ USD
+          </button>
+          <button
+            type="button"
+            onClick={() => setUnit("percent")}
+            className={`num px-2.5 py-0.5 transition-colors ${
+              isPercent ? "bg-raised text-brass font-medium" : "text-muted hover:text-paper"
+            }`}
+          >
+            % Persen
+          </button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-8 border-b border-line">
         {["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"].map((day) => (
           <div key={day} className="num px-3 py-2 text-[11px] text-muted">
@@ -75,6 +106,7 @@ export function CalendarView({
           (sum, cell) => sum + (byDay.get(cell.key)?.count ?? 0),
           0,
         );
+        const weekPercent = startingBalance > 0 ? (weekPnl / startingBalance) * 100 : 0;
 
         return (
           <div key={weekIndex} className="grid grid-cols-8 ledger-row">
@@ -98,6 +130,8 @@ export function CalendarView({
                   : day.pnl < 0
                     ? `rgba(224, 87, 74, ${0.12 + intensity * 0.45})`
                     : "rgba(124, 136, 148, 0.18)";
+
+              const dayPercent = day && startingBalance > 0 ? (day.pnl / startingBalance) * 100 : 0;
 
               return (
                 <div
@@ -131,7 +165,9 @@ export function CalendarView({
                             : "text-flat"
                       }`}
                     >
-                      {formatSignedMoney(day.pnl)}
+                      {isPercent
+                        ? `${dayPercent >= 0 ? "+" : ""}${dayPercent.toFixed(2)}%`
+                        : formatSignedMoney(day.pnl)}
                     </span>
                   ) : (
                     <span className="num mt-1 block text-[11px] text-muted">-</span>
@@ -150,7 +186,11 @@ export function CalendarView({
                       : "text-muted"
                 }`}
               >
-                {weekPnl === 0 && weekCount === 0 ? "-" : formatSignedMoney(weekPnl)}
+                {weekPnl === 0 && weekCount === 0
+                  ? "-"
+                  : isPercent
+                    ? `${weekPercent >= 0 ? "+" : ""}${weekPercent.toFixed(2)}%`
+                    : formatSignedMoney(weekPnl)}
               </span>
               <span className="num text-[11px] text-muted">{weekCount} trade</span>
             </div>
@@ -169,7 +209,7 @@ export function CalendarView({
                 </h3>
                 <span className="num text-xs text-muted">
                   {selectedDayData
-                    ? `${selectedDayData.count} trade · Total ${formatSignedMoney(selectedDayData.pnl)}`
+                    ? `${selectedDayData.count} trade · Total ${formatSignedMoney(selectedDayData.pnl)} (${selectedDayData.pnl >= 0 ? "+" : ""}${((selectedDayData.pnl / startingBalance) * 100).toFixed(2)}%)`
                     : "Belum ada trade di tanggal ini"}
                 </span>
               </div>
@@ -189,36 +229,42 @@ export function CalendarView({
                 </p>
               ) : (
                 <ul className="divide-y divide-line/60">
-                  {selectedTrades.map((t) => (
-                    <li key={t.id} className="py-2.5">
-                      <Link
-                        href={`/trades/${t.id}`}
-                        className="flex items-center justify-between hover:text-brass"
-                      >
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="num font-semibold">{t.pair}</span>
-                            <span
-                              className={`num text-xs ${
-                                t.direction === "Buy" ? "text-profit" : "text-loss"
-                              }`}
-                            >
-                              {t.direction}
-                            </span>
-                            <span className="num text-[10px] text-muted border border-line px-1">
-                              {t.result}
+                  {selectedTrades.map((t) => {
+                    const tradePercent = startingBalance > 0 ? (t.profit_loss / startingBalance) * 100 : 0;
+                    return (
+                      <li key={t.id} className="py-2.5">
+                        <Link
+                          href={`/trades/${t.id}`}
+                          className="flex items-center justify-between hover:text-brass"
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="num font-semibold">{t.pair}</span>
+                              <span
+                                className={`num text-xs ${
+                                  t.direction === "Buy" ? "text-profit" : "text-loss"
+                                }`}
+                              >
+                                {t.direction}
+                              </span>
+                              <span className="num text-[10px] text-muted border border-line px-1">
+                                {t.result}
+                              </span>
+                            </div>
+                            <span className="num text-[11px] text-muted">
+                              {formatTimeWib(t.entry_time)} WIB
                             </span>
                           </div>
-                          <span className="num text-[11px] text-muted">
-                            {formatTimeWib(t.entry_time)} WIB
-                          </span>
-                        </div>
-                        <span className={`num text-sm ${pnlClass(t.profit_loss)}`}>
-                          {formatSignedMoney(t.profit_loss)}
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
+                          <div className={`num text-right ${pnlClass(t.profit_loss)}`}>
+                            <span className="text-sm font-medium">{formatSignedMoney(t.profit_loss)}</span>
+                            <span className="ml-1.5 text-xs opacity-80">
+                              ({tradePercent >= 0 ? "+" : ""}{tradePercent.toFixed(2)}%)
+                            </span>
+                          </div>
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>
