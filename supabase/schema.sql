@@ -123,7 +123,7 @@ create table if not exists public.trade_tags (
 create table if not exists public.daily_notes (
   id             uuid primary key default gen_random_uuid(),
   user_id        uuid not null references auth.users (id) on delete cascade,
-  day            date not null,
+  day            text not null,
   morning_plan   text,
   evening_review text,
   mood           text,
