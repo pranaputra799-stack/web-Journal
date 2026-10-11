@@ -1,0 +1,145 @@
+import Link from "next/link";
+
+// Shared primitives. Kept small on purpose: the ledger look comes from
+// borders, type and spacing rather than from a component library.
+
+export function PageHeader({
+  title,
+  lead,
+  action,
+}: {
+  title: string;
+  lead?: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <header className="border-b border-line px-5 py-6 md:px-8">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl leading-tight md:text-3xl">{title}</h1>
+          {lead && <p className="mt-1.5 text-sm text-muted">{lead}</p>}
+        </div>
+        {action}
+      </div>
+    </header>
+  );
+}
+
+export function Panel({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return <section className={`panel-surface ${className}`}>{children}</section>;
+}
+
+export function PanelHead({
+  title,
+  note,
+}: {
+  title: string;
+  note?: string;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 border-b border-line px-4 py-3">
+      <h2 className="text-base">{title}</h2>
+      {note && <span className="num text-xs text-muted">{note}</span>}
+    </div>
+  );
+}
+
+export function Empty({
+  title,
+  hint,
+  action,
+}: {
+  title: string;
+  hint: string;
+  action?: { href: string; label: string };
+}) {
+  return (
+    <div className="px-5 py-12 text-center">
+      <p className="text-lg">{title}</p>
+      <p className="mx-auto mt-2 max-w-sm text-sm text-muted">{hint}</p>
+      {action && (
+        <Link
+          href={action.href}
+          className="num mt-5 inline-block border border-brass px-3 py-2 text-sm text-brass"
+        >
+          {action.label}
+        </Link>
+      )}
+    </div>
+  );
+}
+
+// Percentages below the sample threshold get this tag so nobody reads noise
+// as a trend.
+export function SmallSampleTag() {
+  return (
+    <span
+      title="Jumlah trade masih di bawah 30, angka ini belum bisa dipercaya."
+      className="num border border-line px-1.5 py-0.5 text-[10px] text-muted"
+    >
+      sampel kecil
+    </span>
+  );
+}
+
+export function Metric({
+  label,
+  value,
+  tone = "paper",
+  note,
+  small,
+  className = "",
+}: {
+  label: string;
+  value: string;
+  tone?: "paper" | "profit" | "loss" | "flat" | "brass";
+  note?: string;
+  small?: boolean;
+  className?: string;
+}) {
+  const toneClass =
+    tone === "profit"
+      ? "text-profit"
+      : tone === "loss"
+        ? "text-loss"
+        : tone === "brass"
+          ? "text-brass"
+          : tone === "flat"
+            ? "text-flat"
+            : "text-paper";
+
+  return (
+    <div className={className}>
+      <div className="flex items-center gap-2">
+        <span className="num text-[11px] text-muted">{label}</span>
+        {small && <SmallSampleTag />}
+      </div>
+      <div className={`num mt-1.5 text-xl ${toneClass}`}>{value}</div>
+      {note && <div className="num mt-1 text-[11px] text-muted">{note}</div>}
+    </div>
+  );
+}
+
+export function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="num text-[11px] text-muted">{label}</span>
+      {children}
+      {hint && <span className="mt-1 block text-xs text-muted">{hint}</span>}
+    </label>
+  );
+}

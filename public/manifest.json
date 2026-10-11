@@ -1,0 +1,16 @@
+{
+  "name": "Jurnal Trading",
+  "short_name": "Jurnal",
+  "description": "Jurnal trading pribadi: catat trade, tinjau statistik, jaga disiplin.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#12151a",
+  "theme_color": "#12151a",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

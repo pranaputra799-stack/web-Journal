@@ -1,0 +1,498 @@
+=====================================================================
+  RENCANA WEBSITE JURNAL TRADING  -  "TRADE JOURNAL DASHBOARD"
+  Disusun untuk: Putra
+  Tanggal: 11 Oktober 2026
+=====================================================================
+
+DAFTAR ISI
+  1.  Tujuan & ringkasan
+  2.  Prinsip desain
+  3.  Rekomendasi teknologi (+ alternatif)
+  4.  Halaman & tata letak
+  5.  Model data (apa saja yang disimpan)
+  6.  Statistik lengkap (daftar metrik + rumus)
+  7.  Kalender jurnal
+  8.  Catatan & jurnal harian
+  9.  Input jurnal (versi sekarang vs versi nanti)
+  10. Screenshot chart
+  11. Fitur khusus akun funded (opsional, tahap lanjut)
+  12. Keamanan & privasi
+  13. Tahapan pengerjaan (roadmap)
+  14. Memindahkan data lama dari Notion
+  15. Keputusan default yang saya ambil + hal yang perlu kamu cek
+  16. Risiko & catatan jujur
+  17. Ide tambahan (kalau ada waktu)
+
+
+---------------------------------------------------------------------
+1. TUJUAN & RINGKASAN
+---------------------------------------------------------------------
+Membuat website pribadi untuk jurnal trading yang:
+  - Menyimpan semua trade (pair, arah, waktu entry/exit, P/L, hasil,
+    R:R, risk, alasan entry, emosi, screenshot).
+  - Menampilkan DASHBOARD STATISTIK yang lengkap.
+  - Punya KALENDER JURNAL (P/L per hari, klik hari untuk lihat detail).
+  - Menyimpan CATATAN per trade dan catatan harian/mingguan.
+  - Bisa dibuka dari HP dan laptop, data sama di semua perangkat.
+
+Prioritas yang kamu minta:
+  (1) Dashboard statistik lengkap   <- paling penting
+  (2) Kalender jurnal
+  (3) Catatan
+  (4) Input jurnal: cukup bisa input dulu, form yang cantik belakangan
+
+Template Notion yang sekarang jadi acuan kolom data:
+  Pair | Date - Entry | Date - Exit | Direction | Profit / Loss |
+  Result | R:R | Risk | Reason - Entry | Note - Emotions | Progress |
+  Screenshots
+
+
+---------------------------------------------------------------------
+2. PRINSIP DESAIN
+---------------------------------------------------------------------
+  - Tema gelap sebagai default (cocok dengan Notion-mu), ada opsi terang.
+  - Hijau = profit, merah = loss, abu = break even. Konsisten di mana saja.
+  - Bahasa antarmuka: Indonesia. Istilah trading tetap Inggris
+    (Win Rate, Profit Factor, Drawdown, dst).
+  - Zona waktu tampilan: WIB (Asia/Jakarta). Di database disimpan UTC.
+  - Mobile-first: semua halaman nyaman di HP (dibuat sebagai PWA,
+    bisa dipasang di layar utama HP).
+  - Filter global di semua halaman: rentang tanggal, akun, pair, arah.
+  - Setiap statistik yang datanya sedikit diberi label "sampel kecil"
+    (misalnya di bawah 30 trade), supaya tidak salah menyimpulkan.
+  - Cepat: angka statistik dihitung sekali lalu di-cache, bukan dihitung
+    ulang tiap buka halaman.
+
+
+---------------------------------------------------------------------
+3. REKOMENDASI TEKNOLOGI
+---------------------------------------------------------------------
+PILIHAN UTAMA (yang saya sarankan)
+  Frontend : Next.js (React) + Tailwind CSS
+  Grafik   : Recharts atau Apache ECharts
+  Database : Supabase (Postgres) -> database, login, dan penyimpanan
+             screenshot dalam satu layanan
+  Hosting  : Vercel (atau Netlify / Cloudflare Pages)
+  Bentuk   : PWA (bisa di-install di HP)
+
+  Alasan:
+    - Supabase memberi database SQL sungguhan, sehingga statistik bisa
+      dihitung dengan query yang rapi.
+    - Login & penyimpanan gambar sudah tersedia, tidak bikin dari nol.
+    - Vercel + Supabase punya free tier yang biasanya cukup untuk 1 orang.
+      (Syarat free tier bisa berubah, cek lagi saat mendaftar.)
+
+ALTERNATIF 1 - Tanpa server (lokal saja)
+  Aplikasi web yang menyimpan data di browser (IndexedDB) + tombol
+  export/import file.
+    + Paling sederhana, tanpa akun, 100% privat.
+    - Data hanya ada di satu perangkat/browser. Kalau browser terhapus,
+      data bisa hilang (harus rutin backup).
+    - Tidak bisa sinkron HP <-> laptop.
+
+ALTERNATIF 2 - Google Sheets sebagai database
+  Website membaca/menulis ke Google Sheets.
+    + Familiar, mudah diedit manual.
+    - Lambat untuk data banyak, ribet soal izin, upload screenshot
+      kurang enak.
+
+ALTERNATIF 3 - Tetap pakai Notion sebagai database
+  Website membaca data dari Notion API.
+    + Data tetap di Notion.
+    - Butuh server kecil untuk menyimpan token, query statistik lambat,
+      dan ada batas request. Tidak cocok untuk statistik yang berat.
+
+KESIMPULAN: pilih Utama (Next.js + Supabase + Vercel).
+
+
+---------------------------------------------------------------------
+4. HALAMAN & TATA LETAK
+---------------------------------------------------------------------
+Menu utama:
+  1. Dashboard      (statistik ringkas + grafik)
+  2. Kalender       (kalender jurnal)
+  3. Trades         (tabel semua trade, filter, cari, edit)
+  4. Statistik      (analisis lengkap, per pair/sesi/emosi, dst)
+  5. Catatan        (jurnal harian, review mingguan)
+  6. Input          (tambah trade baru)
+  7. Pengaturan     (akun trading, saldo awal, zona waktu, export/import)
+
+SKETSA DASHBOARD
+  +--------------------------------------------------------------+
+  | [Rentang: Bulan ini v] [Akun: Funded #1 v] [Pair: Semua v]   |
+  +--------------------------------------------------------------+
+  | Net P/L    | Win Rate | Profit Factor | Expectancy | Trades   |
+  | +$420.50   | 58%      | 1.74          | +$12.4     | 34       |
+  +--------------------------------------------------------------+
+  | EQUITY CURVE (garis)          | DRAWDOWN (area merah)        |
+  |                               |                              |
+  +--------------------------------------------------------------+
+  | P/L HARIAN (batang)           | DISTRIBUSI HASIL (TP/SL/BE)  |
+  +--------------------------------------------------------------+
+  | Pair terbaik / terburuk | Hari terbaik | Streak sekarang       |
+  +--------------------------------------------------------------+
+  | 5 TRADE TERAKHIR (klik untuk detail)                         |
+  +--------------------------------------------------------------+
+
+SKETSA KALENDER
+  +--------------------------------------------------------------+
+  |  < Oktober 2026 >           Total bulan: +$420.50 | 34 trade |
+  +------+------+------+------+------+------+------+-------------+
+  | Sen  | Sel  | Rab  | Kam  | Jum  | Sab  | Min  | Ringkasan   |
+  +------+------+------+------+------+------+------+  minggu     |
+  |      |      |  1   |  2   |  3   |      |      |             |
+  |      |      |+$25  |-$12  |+$40  |      |      |  +$53       |
+  |      |      | 2 tr | 1 tr | 3 tr |      |      |  6 trade    |
+  +------+------+------+------+------+------+------+-------------+
+  (sel hijau/merah, makin pekat makin besar nominalnya)
+
+SKETSA DETAIL TRADE
+  Pair, arah, waktu entry/exit, durasi, P/L, hasil, R:R, risk,
+  alasan entry, emosi, tag, catatan bebas, galeri screenshot,
+  tombol edit/hapus.
+
+
+---------------------------------------------------------------------
+5. MODEL DATA
+---------------------------------------------------------------------
+TABEL accounts (akun trading)
+  id, nama (mis. "Funded 50K"), tipe (funded/live/demo), mata uang,
+  saldo_awal, tanggal_mulai, target_profit (opsional),
+  max_daily_loss (opsional), max_total_loss (opsional), aktif
+
+TABEL trades
+  id, account_id
+  pair                (teks, mis. XAUUSD)
+  direction           (Buy / Sell)
+  entry_time, exit_time   (timestamp UTC; tampil WIB)
+  entry_price, exit_price, stop_loss, take_profit   (opsional)
+  lot_size                (opsional)
+  profit_loss             (angka, dalam mata uang akun)
+  result                  (TP / SL / BE / Manual)
+  planned_rr              (R:R rencana, mis. 2)
+  risk_percent            (mis. 0.25)
+  risk_amount             (dalam $, dihitung otomatis dari saldo jika ada)
+  r_multiple              (hasil dalam satuan R, dihitung otomatis)
+  reason_entry            (teks)
+  emotion                 (pilihan: Tenang, FOMO, Takut, Serakah, Revenge...)
+  emotion_note            (teks bebas)
+  mistakes / lessons      (teks, opsional)
+  followed_plan           (ya/tidak, opsional)
+  status                  (Open / Done)
+  created_at, updated_at
+
+TABEL trade_screenshots
+  id, trade_id, file_path, caption, urutan (mis. "sebelum"/"sesudah")
+
+TABEL tags + trade_tags
+  Tag bebas untuk setup/strategi (mis. "VWAP", "ORB", "News").
+
+TABEL daily_notes
+  id, tanggal, rencana_pagi, review_malam, mood, catatan_bebas
+
+TABEL weekly_reviews (tahap lanjut)
+  id, minggu_ke, hal_yang_berjalan_baik, kesalahan, target_minggu_depan
+
+CATATAN PENTING TENTANG R:R DI TEMPLATMU
+  Di fotomu satu trade berisi Result = SL tetapi R:R = 1. Artinya kolom
+  R:R kemungkinan R:R RENCANA, bukan hasil sebenarnya. Maka:
+    - planned_rr disimpan sebagai input.
+    - R aktual dihitung = profit_loss / risk_amount
+      (risk_amount = saldo x risk_percent, atau diisi manual).
+    - Kalau saldo tidak diisi, statistik berbasis R aktual ditandai
+      "butuh saldo awal" dan tetap bisa jalan memakai asumsi:
+      SL = -1R, TP = +planned_rr R (perkiraan kasar).
+
+
+---------------------------------------------------------------------
+6. STATISTIK LENGKAP
+---------------------------------------------------------------------
+A. RINGKASAN UTAMA
+  - Total trade, jumlah menang / kalah / BE
+  - Win rate        = menang / (menang + kalah)  [BE dilaporkan terpisah]
+  - Net P/L         = total profit + total loss
+  - Gross profit, gross loss
+  - Profit factor   = gross profit / |gross loss|
+  - Expectancy ($)  = rata-rata P/L per trade
+  - Expectancy (R)  = rata-rata R per trade
+  - Rata-rata menang, rata-rata kalah
+  - Payoff ratio    = rata-rata menang / |rata-rata kalah|
+  - Break-even win rate = 1 / (1 + payoff ratio)
+    (win rate minimum agar impas; dibandingkan dengan win rate nyata)
+  - Trade terbaik, trade terburuk
+  - Rata-rata R:R rencana, rata-rata risk %
+  - Rata-rata durasi trade (menang vs kalah)
+  - Trade per hari / per minggu
+
+B. STREAK & KONSISTENSI
+  - Streak menang/kalah sekarang
+  - Streak menang terpanjang, streak kalah terpanjang
+  - Hari profit vs hari loss, persentase hari profit
+  - Hari terbaik, hari terburuk
+  - Minggu dan bulan terbaik / terburuk
+  - Win rate bergulir (rolling 20 trade terakhir)
+  - Konsistensi: profit hari terbesar dibanding total profit
+    (penting untuk aturan konsistensi di beberapa prop firm)
+
+C. EQUITY & DRAWDOWN
+  - Kurva equity (kumulatif P/L, dari saldo awal)
+  - Max drawdown ($ dan %), tanggal terjadinya
+  - Drawdown saat ini
+  - Lama drawdown & lama pemulihan
+  - Recovery factor = net profit / max drawdown
+  - Simpangan baku P/L, Sharpe/Sortino sederhana (opsional,
+    diberi penjelasan singkat agar tidak menyesatkan)
+
+D. PEMECAHAN (BREAKDOWN) - semua menampilkan: jumlah trade, win rate,
+   net P/L, profit factor, expectancy
+  - Per pair
+  - Per arah (Buy vs Sell)
+  - Per hari dalam seminggu
+  - Per jam (WIB)
+  - Per sesi (Asia / London / New York, jam bisa diatur di pengaturan)
+  - Per hasil (TP / SL / BE / Manual)
+  - Per ukuran risk (kecil / sedang / besar)
+  - Per durasi (scalp <15 menit, intraday, swing)
+  - Per bulan
+  - Per tag/setup/strategi
+  - Per akun
+
+E. ANALISIS EMOSI & DISIPLIN
+  - Win rate dan P/L per emosi (mis. "FOMO" rata-rata -$18 per trade)
+  - "Biaya emosi": total P/L dari trade ber-emosi buruk
+  - Trade yang mengikuti plan vs tidak
+  - Hubungan jumlah trade per hari dengan hasil
+    (apakah overtrading setelah loss?)
+  - Trade setelah loss beruntun: hasilnya lebih buruk atau tidak?
+  - Kata yang paling sering muncul di catatan kesalahan
+
+F. VISUALISASI
+  - Equity curve + drawdown
+  - Batang P/L harian/mingguan/bulanan
+  - Donat/batang distribusi hasil (TP/SL/BE)
+  - Heatmap jam x hari (di mana kamu paling profit)
+  - Histogram distribusi R (sebaran hasil trade)
+  - Scatter risk vs hasil
+  - Perbandingan dua periode (bulan ini vs bulan lalu)
+
+PRINSIP: setiap kartu statistik bisa diklik untuk melihat daftar trade
+yang membentuk angka itu (drill-down).
+
+
+---------------------------------------------------------------------
+7. KALENDER JURNAL
+---------------------------------------------------------------------
+Tampilan:
+  - Kalender bulanan; tiap hari menampilkan P/L, jumlah trade, dan warna
+    (hijau/merah, pekat sesuai besar nominal).
+  - Kolom ringkasan per minggu di sisi kanan (P/L, jumlah trade, win rate).
+  - Ringkasan bulan di atas (total P/L, win rate, hari profit/loss).
+  - Mode tahunan: heatmap seperti kalender kontribusi GitHub.
+
+Interaksi:
+  - Klik hari -> panel samping berisi daftar trade hari itu, catatan
+    harian, dan screenshot.
+  - Tombol "+ Tambah trade" langsung dengan tanggal terpilih.
+  - Penanda hari yang BELUM dijurnal tetapi ada aktivitas
+    (membantu disiplin menjurnal).
+  - Hari libur/tidak trading ditandai netral.
+  - Filter akun dan pair berlaku di kalender.
+
+Aturan perhitungan:
+  - Trade masuk ke hari berdasarkan waktu EXIT (atau entry, bisa diatur
+    di pengaturan) dalam zona waktu WIB.
+
+
+---------------------------------------------------------------------
+8. CATATAN & JURNAL HARIAN
+---------------------------------------------------------------------
+Level catatan:
+  1. Catatan per trade: alasan entry, emosi, kesalahan, pelajaran.
+  2. Catatan harian: rencana pagi (bias, level penting, batas risk hari
+     ini) dan review malam (apa yang berjalan baik/buruk, mood).
+  3. Review mingguan: ringkasan, pelajaran, target minggu depan.
+
+Fitur:
+  - Editor dengan format sederhana (tebal, daftar, centang).
+  - Tag dan pencarian teks penuh ("cari semua catatan yang menyebut FOMO").
+  - Templat catatan yang bisa diubah.
+  - Aturan pribadi (checklist) yang bisa dicentang sebelum/ sesudah
+    trade: mis. "Sudah cek news?", "Risk <= 0.5%?". Hasil centang dipakai
+    di statistik disiplin.
+  - Riwayat perubahan sederhana (supaya catatan lama tidak hilang).
+
+
+---------------------------------------------------------------------
+9. INPUT JURNAL
+---------------------------------------------------------------------
+VERSI SEKARANG (Fase 1) - fungsional dulu
+  - Satu halaman form biasa berisi semua kolom di atas.
+  - Pair dengan saran cepat, arah dengan tombol Buy/Sell,
+    date-time picker, emosi dengan pilihan cepat.
+  - Upload screenshot (pilih file / tempel dari clipboard).
+  - Simpan, edit, dan hapus trade.
+  - Validasi dasar (angka, waktu exit setelah entry).
+
+VERSI NANTI (Fase 5) - nyaman seperti Google Form
+  - Form bertahap (wizard) satu pertanyaan per layar di HP.
+  - Duplikat trade terakhir, template per strategi.
+  - Auto-hitung R:R & risk dari harga entry/SL/TP.
+  - Draft otomatis tersimpan kalau tab tertutup.
+  - Input suara/cepat (opsional), shortcut keyboard.
+  - Opsi input lewat bot Telegram yang menulis ke database yang sama.
+
+
+---------------------------------------------------------------------
+10. SCREENSHOT CHART
+---------------------------------------------------------------------
+  - Upload beberapa gambar per trade, beri label (Sebelum, Sesudah, HTF).
+  - Disimpan di penyimpanan privat (bukan publik); ditampilkan lewat
+    link sementara bertanda tangan.
+  - Pratinjau galeri, klik untuk memperbesar.
+  - Gambar dikompres otomatis di sisi browser agar hemat kuota
+    penyimpanan, dengan opsi simpan kualitas asli.
+  - Batas ukuran per file dan total ditampilkan di Pengaturan.
+
+
+---------------------------------------------------------------------
+11. FITUR KHUSUS AKUN FUNDED (OPSIONAL, TAHAP LANJUT)
+---------------------------------------------------------------------
+Karena kamu memakai akun funded, ini bisa sangat berguna:
+  - Pelacak daily loss dan total drawdown terhadap batas aturan
+    (angka batas diisi manual sesuai prop firm-mu).
+  - Progres menuju profit target.
+  - Cek aturan konsistensi (mis. profit hari terbesar vs total).
+  - Peringatan jika risk hari ini mendekati batas.
+  - Hitung sisa "ruang" sebelum menyentuh limit.
+Catatan: aturan tiap prop firm berbeda dan bisa berubah, jadi semua
+angka batas diisi dan diperiksa sendiri oleh kamu.
+
+
+---------------------------------------------------------------------
+12. KEAMANAN & PRIVASI
+---------------------------------------------------------------------
+  - Login wajib (email + password, atau tautan ajaib via email).
+  - Pendaftaran umum DIMATIKAN setelah akunmu dibuat.
+  - Row Level Security di database: hanya akunmu yang bisa
+    membaca/menulis data.
+  - Bucket screenshot privat.
+  - Kunci rahasia (API key) hanya di pengaturan server, tidak pernah
+    ada di kode yang dikirim ke browser.
+  - Jangan simpan password broker atau data kartu di website ini.
+  - Backup: tombol export semua data (CSV + JSON) di Pengaturan,
+    disarankan dijalankan rutin (mis. sebulan sekali).
+  - Pertimbangkan 2FA untuk akun login.
+
+
+---------------------------------------------------------------------
+13. ROADMAP PENGERJAAN
+---------------------------------------------------------------------
+FASE 0 - Persiapan (setengah hari)
+  - Buat akun Supabase dan Vercel, buat repository kode.
+  - Putuskan hal di bagian 15.
+
+FASE 1 - Fondasi + input dasar  (target: bisa mulai dipakai)
+  - Skema database, login, Row Level Security.
+  - Halaman Input (form fungsional) + daftar Trades + edit/hapus.
+  - Upload screenshot.
+  - Catatan per trade.
+
+FASE 2 - Dashboard statistik inti
+  - Kartu ringkasan (bagian 6A), equity curve, drawdown, P/L harian.
+  - Filter global (tanggal, akun, pair, arah).
+
+FASE 3 - Kalender jurnal
+  - Kalender bulanan + ringkasan mingguan + panel detail hari.
+  - Catatan harian.
+
+FASE 4 - Statistik lengkap
+  - Semua breakdown (6D), streak/konsistensi (6B), emosi/disiplin (6E),
+    heatmap dan histogram (6F), drill-down, label sampel kecil.
+
+FASE 5 - Form input nyaman + impor
+  - Wizard ala Google Form, duplikat trade, auto-hitung.
+  - Impor data lama dari Notion (bagian 14), export data.
+  - PWA dipoles agar nyaman di HP.
+
+FASE 6 - Opsional
+  - Fitur akun funded, review mingguan, bot Telegram sebagai jalur input,
+    sinkron ke Notion, ringkasan mingguan otomatis oleh AI.
+
+Urutan ini membuat kamu sudah bisa mencatat sejak Fase 1, dan statistik
+menyusul begitu data mulai terkumpul.
+
+
+---------------------------------------------------------------------
+14. MEMINDAHKAN DATA LAMA DARI NOTION
+---------------------------------------------------------------------
+  - Di Notion: menu database -> Export -> CSV.
+  - Website menyediakan halaman Impor: unggah CSV, petakan kolom
+    (Pair, Date - Entry, ..., Screenshots), lihat pratinjau, lalu impor.
+  - Screenshot lama di Notion tidak ikut dalam CSV; harus diunduh
+    terpisah (atau dibiarkan di Notion dan disimpan tautannya).
+  - Format tanggal dan angka (mis. "$25.20", "0.25%") dibersihkan
+    otomatis saat impor.
+
+
+---------------------------------------------------------------------
+15. KEPUTUSAN DEFAULT & HAL YANG PERLU KAMU CEK
+---------------------------------------------------------------------
+Karena kamu mempercayakan keputusan ke saya, ini default yang saya pakai.
+Ubah kapan saja:
+
+  - Bahasa UI: Indonesia                - Tema: gelap (default)
+  - Zona waktu: Asia/Jakarta (WIB)      - Mata uang: USD
+  - Trade dihitung ke hari: waktu EXIT  - Banyak akun: didukung
+  - Sesi pasar (WIB, bisa diubah di pengaturan):
+      Asia ~ 06.00-15.00, London ~ 14.00-23.00, New York ~ 19.00-04.00
+      (perkiraan kasar; tumpang tindih diperbolehkan)
+  - Kolom emosi: pilihan cepat + catatan bebas
+  - Hasil: TP / SL / BE / Manual
+
+Yang perlu kamu putuskan/isi:
+  1. Saldo awal tiap akun (agar drawdown %, R aktual, dan equity akurat).
+  2. Apakah R:R di templatmu itu R:R rencana atau hasil? (lihat bagian 5)
+  3. Apakah kamu mau banyak akun (funded + live + demo) dipisah?
+  4. Apakah data lama di Notion mau diimpor?
+  5. Daftar emosi dan tag yang kamu pakai sehari-hari.
+
+
+---------------------------------------------------------------------
+16. RISIKO & CATATAN JUJUR
+---------------------------------------------------------------------
+  - Statistik hanya menggambarkan masa lalu. Dengan trade yang sedikit,
+    angka seperti win rate dan profit factor sangat mudah menyesatkan.
+    Itu sebabnya ada label "sampel kecil".
+  - Statistik yang bagus bukan jaminan hasil ke depan; dashboard ini
+    alat refleksi, bukan saran trading.
+  - Dashboard lengkap itu bagus, tetapi manfaat terbesar jurnal tetap
+    datang dari mencatat KONSISTEN dan jujur, terutama bagian emosi dan
+    kesalahan. Website sebaiknya membuat pencatatan semudah mungkin,
+    karena itu form input tetap perlu dipoles di Fase 5.
+  - Free tier layanan bisa berubah. Pantau batas penyimpanan dan
+    lakukan backup rutin.
+  - Membuat dashboard selengkap ini butuh waktu bertahap. Lebih baik
+    selesaikan Fase 1-3 dulu dan pakai, baru lanjut Fase 4+.
+  - Data trading itu sensitif. Jangan lewati bagian keamanan (12).
+
+
+---------------------------------------------------------------------
+17. IDE TAMBAHAN (KALAU ADA WAKTU)
+---------------------------------------------------------------------
+  - Ringkasan mingguan otomatis: pola yang terlihat, kesalahan yang
+    berulang, dan satu hal untuk diperbaiki minggu depan.
+  - Pengingat jurnal harian lewat notifikasi atau Telegram.
+  - Mode "review" yang menampilkan trade satu per satu beserta screenshot
+    untuk evaluasi cepat di akhir pekan.
+  - Tujuan bulanan (target P/L, maksimal trade, maksimal risk) dengan
+    bilah progres.
+  - Perbandingan dengan rencana trading: seberapa sering kamu mengikuti
+    aturan sendiri.
+  - Berbagi laporan bulanan sebagai PDF (untuk mentor/komunitas),
+    dengan opsi menyembunyikan nominal.
+
+=====================================================================
+  RINGKAS: Next.js + Supabase + Vercel. Mulai dari input dasar dan
+  database (Fase 1), lalu dashboard inti (Fase 2), kalender (Fase 3),
+  baru statistik lengkap (Fase 4), form cantik dan impor (Fase 5).
+=====================================================================

@@ -1,26 +1,156 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------------------------------------------------------------------
+   Trade Journal Dashboard - design tokens
+
+   Concept: a signal instrument crossed with a paper ledger. The instrument
+   parts stay clinical, the writing parts stay personal.
+
+   Green and red mean money and nothing else. The one UI accent is brass, so
+   the accent never competes with a profit or loss colour.
+   --------------------------------------------------------------------------- */
+
+:root,
+[data-theme="dark"] {
+  --ink: #12151a;
+  --panel: #1a1f26;
+  --raised: #222831;
+  --line: #2a313a;
+  --paper: #e8e6e1;
+  --muted: #8a9199;
+  --brass: #d9a441;
+  --brass-ink: #1a1206;
+  --profit: #3fb27f;
+  --loss: #e0574a;
+  --flat: #7c8894;
+}
+
+[data-theme="light"] {
+  --ink: #f6f4ef;
+  --panel: #ffffff;
+  --raised: #fbfaf7;
+  --line: #e0dcd2;
+  --paper: #1a1c1e;
+  --muted: #6b7280;
+  --brass: #9a6a12;
+  --brass-ink: #fff8ea;
+  --profit: #1d8a5a;
+  --loss: #bc3a2c;
+  --flat: #6b7280;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink);
+  --color-panel: var(--panel);
+  --color-raised: var(--raised);
+  --color-line: var(--line);
+  --color-paper: var(--paper);
+  --color-muted: var(--muted);
+  --color-brass: var(--brass);
+  --color-brass-ink: var(--brass-ink);
+  --color-profit: var(--profit);
+  --color-loss: var(--loss);
+  --color-flat: var(--flat);
+
+  --font-serif: var(--font-newsreader), Georgia, serif;
+  --font-mono: var(--font-spline-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-serif);
+  font-synthesis-weight: none;
+}
+
+/* Every figure, timestamp and label uses the mono face so columns line up. */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* A ledger row: ruled, square, no card chrome. */
+.ledger-row {
+  border-bottom: 1px solid var(--line);
+}
+
+/* Floating surfaces get one small radius. Ledger rows and strips stay square,
+   so radius encodes hierarchy instead of decorating everything. */
+.panel-surface {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+/* The single orchestrated page-load moment: a short rise, staggered by the
+   element's own --d. Kept to one reveal, not a fade on every card. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 420ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+
+  * {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Native controls inherit the theme instead of the OS default. */
+input,
+select,
+textarea,
+button {
+  font: inherit;
+  color: inherit;
+}
+
+input,
+select,
+textarea {
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 0.5rem 0.625rem;
+  width: 100%;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--brass);
+  outline: none;
+}
+
+::selection {
+  background: var(--brass);
+  color: var(--brass-ink);
 }
