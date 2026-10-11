@@ -216,7 +216,7 @@ export function drawdown(
 
   let worst = points[0];
   for (const point of points) {
-    const worstVal = isStatic ? point.staticDrawdown : point.drawdown;
+    const worstVal = isStatic ? worst.staticDrawdown : worst.drawdown;
     const curVal = isStatic ? point.staticDrawdown : point.drawdown;
     if (curVal > worstVal) worst = point;
   }

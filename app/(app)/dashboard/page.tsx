@@ -51,11 +51,11 @@ export default async function DashboardPage({
   const bounds = rangeBounds(range);
 
   // Filtered trades for the selected date range / account — used for stats.
-  // ALL trades (unfiltered) — used for equity curve & total saldo.
+  // ALL trades (no date filter, but respecting account) — used for equity curve & total saldo.
   const [accounts, trades, allTrades] = await Promise.all([
     listAccounts(),
     listTrades({ from: bounds.from, to: bounds.to, accountId: params.akun }),
-    listTrades(),
+    listTrades({ accountId: params.akun }),
   ]);
 
   const summary = summarise(trades);
@@ -64,7 +64,7 @@ export default async function DashboardPage({
     (activeAccount?.starting_balance ??
       accounts.reduce((sum, account) => sum + account.starting_balance, 0)) || 10000;
 
-  // Equity curve is based on ALL trades so "Saldo Saat Ini" is always accurate.
+  // Equity curve is based on ALL trades (for this account) so "Saldo Saat Ini" is always accurate.
   const allSummary = summarise(allTrades);
   const points = equityCurve(allTrades, startingBalance);
   const dd = drawdown(points, allSummary.netPnl, ddMode, startingBalance, 4);
