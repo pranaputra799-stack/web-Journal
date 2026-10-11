@@ -10,6 +10,7 @@ const LINKS = [
   {
     href: "/dashboard",
     label: "Dasbor",
+    shortLabel: "Dasbor",
     icon: (
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <rect x="3" y="3" width="7" height="7" rx="1" strokeWidth="1.8" />
@@ -22,6 +23,7 @@ const LINKS = [
   {
     href: "/trades",
     label: "Trades",
+    shortLabel: "Trades",
     icon: (
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -31,6 +33,7 @@ const LINKS = [
   {
     href: "/calendar",
     label: "Kalender",
+    shortLabel: "Kalender",
     icon: (
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth="1.8" />
@@ -41,6 +44,7 @@ const LINKS = [
   {
     href: "/statistik",
     label: "Statistik",
+    shortLabel: "Stats",
     icon: (
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M18 20V10M12 20V4M6 20v-6" />
@@ -50,6 +54,7 @@ const LINKS = [
   {
     href: "/catatan",
     label: "Catatan",
+    shortLabel: "Catatan",
     icon: (
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -59,6 +64,7 @@ const LINKS = [
   {
     href: "/input",
     label: "Input",
+    shortLabel: "Input",
     icon: (
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="9" strokeWidth="1.8" />
@@ -69,6 +75,7 @@ const LINKS = [
   {
     href: "/pengaturan",
     label: "Pengaturan",
+    shortLabel: "Setelan",
     icon: (
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -242,21 +249,30 @@ export function AppNav({ email }: { email: string }) {
       </div>
 
       {/* Bottom tab bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-line bg-ink/95 backdrop-blur-sm md:hidden">
-        <ul className="flex">
+      <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-line bg-ink/95 backdrop-blur-md md:hidden pb-safe">
+        <ul className="grid grid-cols-7 items-stretch">
           {LINKS.map((link) => {
             const active = isActive(link.href);
+            const isInput = link.href === "/input";
             return (
-              <li key={link.href} className="flex-1">
+              <li key={link.href} className="flex">
                 <Link
                   href={link.href}
                   aria-current={active ? "page" : undefined}
-                  className={`flex flex-col items-center gap-1 py-2.5 text-[10px] transition-colors ${
-                    active ? "text-brass" : "text-muted"
+                  className={`flex flex-col items-center justify-center w-full py-2 text-[9px] transition-colors ${
+                    active
+                      ? "text-brass font-medium bg-brass/5"
+                      : isInput
+                      ? "text-brass/90 hover:text-brass"
+                      : "text-muted hover:text-paper"
                   }`}
                 >
-                  {link.icon}
-                  <span className="num">{link.label}</span>
+                  <span className={`transition-transform duration-150 ${active ? "scale-110" : ""}`}>
+                    {link.icon}
+                  </span>
+                  <span className="num mt-1 truncate max-w-full px-0.5 tracking-tight">
+                    {link.shortLabel ?? link.label}
+                  </span>
                 </Link>
               </li>
             );

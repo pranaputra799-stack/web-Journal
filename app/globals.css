@@ -143,6 +143,19 @@ textarea {
   width: 100%;
 }
 
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important; /* Cegah auto-zoom di iOS Safari saat fokus input */
+    min-height: 44px; /* Standar kenyamanan sentuhan mobile Apple & Google */
+  }
+
+  textarea {
+    min-height: 80px;
+  }
+}
+
 input:focus,
 select:focus,
 textarea:focus {
